@@ -13,7 +13,7 @@ title: Logging
 
 * 形式の明示的な指定の例
 ``` go
-// userId, requestId, endpoint をこの logger を使うすべての statement に付与 
+// userId, requestId をこの logger を使うすべての statement に付与
 log := logger.With(zap.String("userId", "fuga"), zap.String("requestId", "piyo"))
 log.Info("hello world")
 ```
