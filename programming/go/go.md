@@ -27,9 +27,17 @@ title: Go
 * [gotraining](https://github.com/ardanlabs/gotraining)
     * 色々なリンク類。Go + alpha でかなり網羅的
 
-### Go 内部詳細
+### 歴史や背景・哲学
+* [Is Go An Object Oriented Language?](https://spf13.com/post/is-go-object-oriented/)
+
+### Go 文法・内部詳細
 * [go-internals](https://github.com/teh-cmc/go-internals)
 * [The Go Memory Model](https://golang.org/ref/mem)
+* [The Go Object Lifecycle](https://middlemost.com/object-lifecycle/)
+* [Go Interfaces](https://www.airs.com/blog/archives/277)
+* [Understanding Nil](https://speakerdeck.com/campoy/understanding-nil)
+* [Go Walkthrough](https://medium.com/go-walkthrough)
+    * io など package について解説
 
 ## Podcast
 * [gotime](https://changelog.com/gotime)
