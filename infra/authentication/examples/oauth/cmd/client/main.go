@@ -130,7 +130,10 @@ func (a *AuthClient) do(ctx context.Context, req *http.Request, v interface{}) (
 	if resp.StatusCode != 200 {
 		return nil, errors.Errorf("request failed(status code: %d status: %s)", resp.StatusCode, resp.Status)
 	}
-	err = json.NewDecoder(resp.Body).Decode(v)
+
+	if v != nil {
+		err = json.NewDecoder(resp.Body).Decode(v)
+	}
 
 	return resp, errors.Wrap(err, "failed to decode response Body")
 }
@@ -166,41 +169,16 @@ func (a *AuthClient) auth() http.HandlerFunc {
 }
 
 func (a *AuthClient) callback() http.HandlerFunc {
+	// TODO: change valid struct
 	type AuthOption struct {
 		ResponseType string `url:"response_type"`
 		ClientID     string `url:"client_id"`
 		RedirectURI  string `url:"redirect_uri"`
 	}
-	opt := AuthOption{
-		ResponseType: "code",
-		ClientID:     clientID,
-		RedirectURI:  redirectURI,
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		// queryParam := r.URL.Query()
-		// queryParam.Get("code")
-
-		urlEncodedBody, err := query.Values(opt)
-		if err != nil {
-			log.Printf("[Error] Failed to set query parameters %s", err)
-			return
-		}
-		if err != nil {
-			log.Printf("[Error] Failed to build authorization URL %s", err)
-			return
-		}
-		req, err := a.newPostRequest(authorizationEndpoint, urlEncodedBody)
-		if err != nil {
-			log.Printf("[Error] Failed to build request %s", err)
-			return
-		}
-
-		var v interface{}
-		if _, err := a.do(context.Background(), req, &v); err != nil {
-			log.Printf("[Error] Failed to send request %s", err)
-			return
-		}
+		queryParam := r.URL.Query()
+		fmt.Println(queryParam.Get("code"))
 	}
 }
 
