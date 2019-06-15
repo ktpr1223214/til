@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 )
 
 // OAuth Client 側の情報
@@ -65,8 +66,8 @@ func (a *AuthClient) Run(port int) error {
 	return nil
 }
 
-// newRequest 認可サーバに対するリクエストを行う
-func (a *AuthClient) newRequest(method string, urlPath string, body interface{}) (*http.Request, error) {
+// newJSONRequest 認可サーバに対するリクエストを行う
+func (a *AuthClient) newJSONRequest(method string, urlPath string, body interface{}) (*http.Request, error) {
 	u, err := a.authorizationURL.Parse(urlPath)
 	if err != nil {
 		return nil, err
@@ -89,6 +90,24 @@ func (a *AuthClient) newRequest(method string, urlPath string, body interface{})
 		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", a.userAgent)
+	return req, nil
+}
+
+// newPostRequest 認可サーバに対するリクエストを行う
+// x-www-form-urlencoded 形式の POST
+func (a *AuthClient) newPostRequest(urlPath string, data url.Values) (*http.Request, error) {
+	u, err := a.authorizationURL.Parse(urlPath)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(u.String())
+
+	req, err := http.NewRequest("POST", u.String(), strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("User-Agent", a.userAgent)
 	return req, nil
 }
@@ -146,8 +165,48 @@ func (a *AuthClient) auth() http.HandlerFunc {
 	}
 }
 
+func (a *AuthClient) callback() http.HandlerFunc {
+	type AuthOption struct {
+		ResponseType string `url:"response_type"`
+		ClientID     string `url:"client_id"`
+		RedirectURI  string `url:"redirect_uri"`
+	}
+	opt := AuthOption{
+		ResponseType: "code",
+		ClientID:     clientID,
+		RedirectURI:  redirectURI,
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		// queryParam := r.URL.Query()
+		// queryParam.Get("code")
+
+		urlEncodedBody, err := query.Values(opt)
+		if err != nil {
+			log.Printf("[Error] Failed to set query parameters %s", err)
+			return
+		}
+		if err != nil {
+			log.Printf("[Error] Failed to build authorization URL %s", err)
+			return
+		}
+		req, err := a.newPostRequest(authorizationEndpoint, urlEncodedBody)
+		if err != nil {
+			log.Printf("[Error] Failed to build request %s", err)
+			return
+		}
+
+		var v interface{}
+		if _, err := a.do(context.Background(), req, &v); err != nil {
+			log.Printf("[Error] Failed to send request %s", err)
+			return
+		}
+	}
+}
+
 func (a *AuthClient) Routes() {
 	a.router.HandleFunc("/authorize", a.auth())
+	a.router.HandleFunc("/callback", a.callback())
 }
 
 func main() {
