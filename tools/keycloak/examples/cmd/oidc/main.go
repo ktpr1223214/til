@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"strings"
 )
 
 const (
@@ -38,16 +39,37 @@ func main() {
 		Endpoint: provider.Endpoint(),
 
 		// "openid" is a required scope for OpenID Connect flows.
-		Scopes: []string{oidc.ScopeOpenID},
+		// keycloak 上で、Assigned Optional Client Scopes に入れる場合は、こうして明示的に scopes に入れる
+		// default に入れている場合は、気にする必要はない
+		Scopes: []string{oidc.ScopeOpenID, "good-service"},
 	}
 
 	// TODO: 適切に設定
 	state := "foobar" // Don't do this in production.
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
+		rawAccessToken := r.Header.Get("Authorization")
+		if rawAccessToken == "" {
+			http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
+			return
+		}
+
+		parts := strings.Split(rawAccessToken, " ")
+		if len(parts) != 2 {
+			w.WriteHeader(400)
+			return
+		}
+		_, err := verifier.Verify(context.Background(), parts[1])
+		if err != nil {
+			log.Println(err)
+			http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
+			return
+		}
+
+		w.Write([]byte("hello world"))
 	})
 
+	// ここでリロードするとエラーとなるが、それは認可コードが一度きりしか使えないため(exchange で失敗)
 	http.HandleFunc("/private/callback", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("state") != state {
 			http.Error(w, "state did not match", http.StatusBadRequest)
@@ -70,7 +92,8 @@ func main() {
 			return
 		}
 
-		oauth2Token.AccessToken = "*REDACTED*"
+		// 編集済み or 裸
+		// oauth2Token.AccessToken = "*REDACTED*"
 
 		resp := struct {
 			OAuth2Token   *oauth2.Token
