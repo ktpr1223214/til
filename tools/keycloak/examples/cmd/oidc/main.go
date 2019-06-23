@@ -18,6 +18,10 @@ const (
 	redirectURL  = "http://localhost:8000/private/callback"
 )
 
+func OidcAuthMiddleware() {
+
+}
+
 func main() {
 	// https://github.com/coreos/go-oidc/blob/v2/oidc.go#L97
 	// wellKnown := strings.TrimSuffix(issuer, "/") + "/.well-known/openid-configuration" なので、
@@ -47,7 +51,9 @@ func main() {
 	// TODO: 適切に設定
 	state := "foobar" // Don't do this in production.
 
+	// TODO: OAuth による保護は、Middleware なりで書くべきかと
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Authorization を要求するのか何を要求するのかはよく考えるべきでは？
 		rawAccessToken := r.Header.Get("Authorization")
 		if rawAccessToken == "" {
 			http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
@@ -109,10 +115,16 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		// TODO: ここどうするのか考える
 		w.Write(data)
+		/*
+		fmt.Println(data)
+		r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", oauth2Token.AccessToken))
+		w.Header().Set("Location", "/")
+		w.WriteHeader(http.StatusFound)
+		// http.Redirect(w, r, "/", http.StatusFound)
+		*/
 	})
-
-	// http.Handle("/hello", http.HandlerFunc(hello))
 	http.ListenAndServe(":8000", nil)
 	fmt.Println(provider)
 }
