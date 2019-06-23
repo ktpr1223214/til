@@ -70,21 +70,20 @@ func (a *AuthClient) Run(port int) error {
 func (a *AuthClient) newJSONRequest(method string, urlPath string, body interface{}) (*http.Request, error) {
 	u, err := a.authorizationURL.Parse(urlPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to parse url %s", urlPath)
 	}
 
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
+		if err := json.NewEncoder(buf).Encode(body); err != nil {
+			return nil, errors.Wrap(err, "failed to encode json body")
 		}
 	}
 
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create new request")
 	}
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
@@ -101,7 +100,6 @@ func (a *AuthClient) newPostRequest(urlPath string, data url.Values) (*http.Requ
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(u.String())
 
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(data.Encode()))
 	if err != nil {
@@ -169,16 +167,42 @@ func (a *AuthClient) auth() http.HandlerFunc {
 }
 
 func (a *AuthClient) callback() http.HandlerFunc {
-	// TODO: change valid struct
-	type AuthOption struct {
-		ResponseType string `url:"response_type"`
-		ClientID     string `url:"client_id"`
-		RedirectURI  string `url:"redirect_uri"`
+	type CallbackOption struct {
+		GrantType   string `url:"grant_type"`
+		Code        string `url:"code"`
+		RedirectURI string `url:"redirect_uri"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		queryParam := r.URL.Query()
-		fmt.Println(queryParam.Get("code"))
+
+		urlEncodedBody, err := query.Values(CallbackOption{
+			GrantType:   "authorization_code",
+			Code:        queryParam.Get("code"),
+			RedirectURI: redirectURI,
+		})
+		if err != nil {
+			log.Printf("[Error] Failed to get url encodeed body %s", err)
+			return
+		}
+
+		u, err := a.authorizationURL.Parse(tokenEndpoint)
+		if err != nil {
+			log.Printf("[Error] Failed to parse url %s", err)
+			return
+		}
+		req, err := a.newPostRequest(u.String(), urlEncodedBody)
+		if err != nil {
+			log.Printf("[Error] Failed to build request %s", err)
+			return
+		}
+		// TODO: basic auth
+		// TODO: parse response body
+
+		if _, err := a.do(context.Background(), req, nil); err != nil {
+			log.Printf("[Error] Failed to send request %s", err)
+			return
+		}
 	}
 }
 

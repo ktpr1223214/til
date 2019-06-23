@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/go-querystring/query"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -145,7 +146,7 @@ func (a *AuthServer) auth() http.HandlerFunc {
 		}
 		urlEncodedBody, err := query.Values(opt)
 		if err != nil {
-			log.Printf("[Error] Failed to set query parameters %s", err)
+			log.Printf("[Error] Failed to get url encodeed body %s", err)
 			return
 		}
 		req, err := a.newPostRequest(authorizationApproveEndpoint, urlEncodedBody)
@@ -205,14 +206,27 @@ func (a *AuthServer) approve() http.HandlerFunc {
 			http.Redirect(w, r, urlPath, 302)
 
 		} else {
-			// TODO: implemente
+			// TODO: implement
 		}
+	}
+}
+
+func (a *AuthServer) token() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Println(string(b))
+
 	}
 }
 
 func (a *AuthServer) Routes() {
 	a.router.HandleFunc("/authorize", a.auth())
 	a.router.HandleFunc("/approve", a.approve())
+	a.router.HandleFunc("/token", a.token())
 }
 
 func (a *AuthServer) Run(port int) error {
