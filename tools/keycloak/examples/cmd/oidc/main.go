@@ -14,7 +14,7 @@ import (
 
 const (
 	clientID     = "oidc-sample"
-	clientSecret = "75b8d827-24d1-49ba-8c03-4769d1c893c9"
+	clientSecret = "1f269cf0-25f1-4704-b123-0353c04af9e1"
 	redirectURL  = "http://localhost:8000/private/callback"
 )
 
