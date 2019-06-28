@@ -82,6 +82,9 @@ Defining and maintaining a standard, XML-based framework for creating and exchan
 * [RFC7529: JSON Web Token (JWT)](https://tools.ietf.org/html/rfc7519.pdf)
 * [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
 
+## OpenID Connect
+* [OpenID Connect と SCIM のエンタープライズ実装ガイドライン](https://www.openid.or.jp/news/eiwg_implementation_guideline_1.0.pdf)
+
 ### XML Signature
 * [XML Signature Syntax and Processing Version 2.0](https://www.w3.org/TR/xmldsig-core2/)
 * [XML Signature Best Practices](https://www.w3.org/TR/2013/NOTE-xmldsig-bestpractices-20130411/)
