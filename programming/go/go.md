@@ -12,6 +12,11 @@ title: Go
 * [Russ cox](https://research.swtch.com/)
 * [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
 
+### package
+* [Go Sub-repository Packages](https://godoc.org/-/subrepo)
+    * These packages are part of the Go Project but outside the main Go tree. They are developed under looser compatibility requirements than the Go core.
+    * ココらへんの機能は変に自作せずに使うと良さげ
+
 ### Go 開発全般
 * [Practical Go: Real world advice for writing maintainable Go programs](https://dave.cheney.net/practical-go/presentations/qcon-china.html)
     * Dave Cheney
