@@ -16,10 +16,34 @@ title: Client
     * 方式は、New~ で引数にする・functional option パターンで渡せるようにしておいて基本はデフォルト設定で初期化など
 
 ### よくある共通実装
+* クエリパラメータの組み立て
+    * go-querystring が便利
+``` go
+// query は github.com/google/go-querystring
+// query.Values(interface{}) で url.Values を返す
+// opt は interface{}
+qs, err := query.Values(opt)
+if err != nil {
+    return s, err
+}
+
+u.RawQuery = qs.Encode()
+// で、u.String() を使う
+```
+
+* リダイレクト
+``` go
+func redirect(w http.ResponseWriter, r *http.Request) {
+    // redirectURL を渡して、http.HandlerFunc を返す形式にしたりすれば良いかと
+    http.Redirect(w, r, "http://www.google.com", 301)
+}
+```
+
 * from go-github
 ``` go
 // メソッド例
 func (s *ActivityService) ListEvents(ctx context.Context, opt *ListOptions) ([]*Event, *Response, error) {
+    // 下の NewRequest で BaseURL.Parse の呼び出しを使っていることに注意
 	u, err := addOptions("events", opt)
 	if err != nil {
 		return nil, nil, err
@@ -156,6 +180,21 @@ func CheckResponse(r *http.Response) error {
 // must be a struct whose fields may contain "url" tags.
 func addOptions(s string, opt interface{}) (string, error) {
 	v := reflect.ValueOf(opt)
+	// ここの条件判定について: なぜ、v.IsNil() だけでは駄目そうなのか
+	// IsNil reports whether its argument v is nil.
+	// The argument must be a chan, func, interface, map, pointer, or slice value; if it is not, IsNil panics.
+	// Note that IsNil is not always equivalent to a regular comparison with nil in Go.
+	// If v was created by calling ValueOf with an uninitialized interface variable i,
+	// i==nil will be true but v.IsNil will panic as v will be the zero Value
+	// となり、また Go の条件判定は、
+	// Logical operators apply to boolean values and yield a result of the same type as the operands.
+	// The right operand is evaluated conditionally.
+	// cf. https://golang.org/ref/spec#Logical_operators
+	// となるので、つまり
+	// 最初の条件が満たされない場合には、panic の可能性があるが && の挙動からそういう場合は起きないから？
+	// また、v.Kind() がそれ以外のケースについてはそのまま進むが、
+	// そこは query.Values の方で対応できそう
+	// ただ、みるとそもそも query.Values で全部対応出来ないのか
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return s, nil
 	}
@@ -165,6 +204,8 @@ func addOptions(s string, opt interface{}) (string, error) {
 		return s, err
 	}
 
+    // query は github.com/google/go-querystring
+    // query.Values(interface{}) で url.Values を返す
 	qs, err := query.Values(opt)
 	if err != nil {
 		return s, err

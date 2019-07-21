@@ -41,7 +41,7 @@ $ curl -u user:pass http://localhost:8888
 
 # プロキシ -x/--proxy プロキシ認証 -U/--proxy-user
 
-# レスポンス300台かつレスポンスヘッダーに Location ヘッダーがあった場合、そのヘッダーで指定された URL に再度リクエスト
+# レスポンス300台かつレスポンスヘッダーに Location ヘッダーがあった場合、そのヘッダーで指定された URL に再度リクエスト(-L)
 $ curl -L http://localhost:8888
 
 # 複数のリクエストを並べることで、Keep-Alive 利用
