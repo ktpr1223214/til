@@ -17,6 +17,30 @@ $ sudo amazon-linux-extras install -y ecs; sudo systemctl enable --now ecs
 ### user data
 * [cloud-init-per ユーティリティ](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/bootstrap_container_instance.html#cloud-init-per)
 
+## network mode
+* [ECSでEC2インスタンスを利用する際のネットワークモードについて調べてみた](https://dev.classmethod.jp/etc/ecs-networking-mode/)
+
+* bridge
+    * ECSインスタンス（EC2） の任意のポートをコンテナのポートにマッピングして利用
+    * ECSインスタンス（EC2） の ENI を複数のタスクが共有で利用
+    * ENI を共用で利用するため SecurityGroup も共有   
+    * ALB と組み合わせる場合は動的ポートで利用することが多い
+    
+* host
+    * Docker の host
+    * コンテナで export されたポートを ECSインスタンス(EC2)でも利用
+        * そのため、一つのホストで同じポートは利用できない
+        
+* awsvpc
+    * ENI がタスクごとにアタッチ
+    * タスク間でのポートマッピングの考慮不要
+    * ENI が独立しているため、ネットワークパフォーマンスの向上が見込める
+    * ENI ごとに SecurityGroup を紐づけられる
+    * ECS インスタンス本体とタスクで SecurityGroup を分けることも可能
+    * VPC FlowLogs で観測可能
+    * ALB と NLB に IP ターゲットとして登録が可能
+    * ECSインスタンス（EC2）の ENI 上限には注意
+
 ## EFS との連携
 * [EFS マウントヘルパー](https://docs.aws.amazon.com/ja_jp/efs/latest/ug/using-amazon-efs-utils.html#efs-mount-helper)
     * 基本はこれを使うべきっぽい
