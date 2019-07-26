@@ -81,9 +81,6 @@ nfsnobo+ 19488 19450  0 03:07 ?        00:00:00 /bin/prometheus --config.file=/e
 * AWS console から service にいって、デプロイ・イベントなどから状況が確認できる
 
 ## service discovery
-* IAM role について
-
-* 
 ``` bash
 # service_id は srv-... という形式で、console だと AWS Cloud Map から確認可能
 $ aws servicediscovery list-instances --service-id <service_id> --region <region>
@@ -99,12 +96,18 @@ $ aws servicediscovery get-namespace --id <namespace_id> --region <region>
 $ aws route53 list-resource-record-sets --hosted-zone-id <hosted_zone_id> --region <region>
 
 # SRV レコードを dig
-# 帰ってきた値を更に dig ると A レコード(private ip アドレス)
+# port 番号と another_domain_name が返る
+# 返ってきた another_domain_name を更に dig ると A レコード(private ip アドレス)
 $ dig SRV <domain_name>
+$ dig <another_domain_name>
 
 # 更に SRV レコードを dig って返る port 番号 + private ip で health check とかサービスを叩ける
 $ curl http://<private_ip>:<port>/<health_check_path>
 ```
+
+* ECS service に紐づけて service discovery があるので、task のコンテナ1種類なら名前など指定せずとも検知してくれる
+* service discovery で VPC 内の private DNS を見る場合には、SG で許可するのは別の SG or vpc_ip とかになり、public ip を間違って指定しないこと
+* エフェメラルポートあたりも注意か
 
 ### service discovery と ECS ネットワークモード
 * [サービス検出 に関する考慮事項](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/service-discovery.html#service-discovery-considerations)
