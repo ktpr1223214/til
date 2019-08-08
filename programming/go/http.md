@@ -76,3 +76,6 @@ title: HTTP
 * Expires フィールドが設定されていない場合、そのクッキーはセッションクッキー(ブラウザ閉じられると削除)で、それ以外は永続性クッキー(期限切れ or 除去されない限り維持)
 * クッキーの値は URL エンコードする必要がある
     * go では ```base64.URLEncoding.EncodeToString(~)```
+
+### その他
+* [Why Handler registered by http.HandleFunc is called twice?](https://groups.google.com/forum/#!topic/golang-nuts/1sgaQGpIILM)
