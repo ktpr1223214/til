@@ -31,6 +31,7 @@ title: Go
     * べからず集として良い
 * [gotraining](https://github.com/ardanlabs/gotraining)
     * 色々なリンク類。Go + alpha でかなり網羅的
+* [Good Code vs Bad Code in Golang](https://medium.com/@teivah/good-code-vs-bad-code-in-golang-84cb3c5da49d)
 
 ### 歴史や背景・哲学
 * [Is Go An Object Oriented Language?](https://spf13.com/post/is-go-object-oriented/)
