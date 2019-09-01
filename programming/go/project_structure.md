@@ -50,7 +50,7 @@ title: Project Structure
     * どこに何を置くかは明確になる
 * cons
     * (go では)naming convention に合わない
-    * circular dependency になりやすい     
+    * circular dependency になりやすい
 
 ### Group By Module
 * Group By Module

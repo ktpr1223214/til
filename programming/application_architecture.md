@@ -8,8 +8,8 @@ title: Application Architecture
 ## 注意
 ### 依存関係
 "依存しない"というのは、パッケージ同士の依存関係が存在しないということだけではなく、そのレイヤが知るべき概念のみレイヤ内で扱うという観点も存在します。
-そのため、本来は users テーブルと user_status テーブルに アクセスするのではなく、
-users テーブルに対する DAO と user_status テーブルに対する DAO を2つ実装し、
+
+そのため、本来は users テーブルと user_status テーブルに アクセスするのではなく、users テーブルに対する DAO と user_status テーブルに対する DAO を2つ実装し、
 モデルレイヤにてそれらを利用して domain.User を作成するべきでしょう。 
 
 ### トランザクションをどこで扱うべきか
@@ -22,3 +22,13 @@ users テーブルに対する DAO と user_status テーブルに対する DAO 
 * [Benefits of dependencies in software projects as a function of effort](https://eli.thegreenplace.net/2017/benefits-of-dependencies-in-software-projects-as-a-function-of-effort/)    
 * [ドメイン駆動設計解説シリーズ](https://little-hands.hatenablog.com/entry/top)
 * [レイヤードアーキテクチャを振り返る](https://buildersbox.corp-sansan.com/entry/2019/04/21/000000_1)
+* [webフロントエンドからwebAPIを呼び出すのをwrapするアレの名前](https://nekogata.hatenablog.com/entry/2019/06/30/211904)
+* [Service LocatorとDependency InjectionパターンとDI Container](https://www.nuits.jp/entry/servicelocator-vs-dependencyinjection)
+* [UseCaseの再利用性](https://yoskhdia.hatenablog.com/entry/2016/10/18/152624)
+
+### API design
+* [API 設計ガイド](https://cloud.google.com/apis/design/)
+  * ネットワーク API の一般的な設計ガイド
+
+### DDD
+* [ボトムアップドメイン駆動設計](https://nrslib.com/bottomup-ddd/)
