@@ -113,3 +113,22 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * [サービス検出 に関する考慮事項](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/service-discovery.html#service-discovery-considerations)
     * サービスタスクで指定されたタスク定義が awsvpc ネットワークモードを使用する場合、各サービスタスクで A レコードまたは SRV レコードを組み合わせて作成できます。SRV レコードを使用する場合、ポートが必要です。
     * サービスタスクで指定されたタスク定義が bridge または host ネットワークモードを使用する場合、SRV のレコードのみがサポートされる DNS レコードタイプです。各サービスタスクの SRV レコードを作成します。SRV レコードのコンテナ名とコンテナポートの組み合わせをタスク定義から指定する必要があります。
+
+## ECS 周辺の様々なロール
+* AmazonEC2ContainerServiceforEC2Role
+  * https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/instance_IAM_role.html
+  * コンテナインスタンス内の ECS エージェントが ECS 呼び出しなどに必要な権限となる
+    * なのでつけ先は EC2 instance
+* AmazonEC2ContainerServiceRole
+  * https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/service_IAM_role.html
+  * Amazon ECS サービススケジューラは、ユーザーに代わって Amazon EC2 および Elastic Load Balancing の API を呼び出し、ロードバランサーを使ってコンテナインスタンスの登録および登録解除を行います。Amazon ECS サービスにロードバランサーをアタッチするには、それらのサービスの開始前に、使用する IAM ロールを作成する必要があります
+    * なのでつけ先は ECS
+* AmazonECSTaskExecutionRolePolicy
+  * https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_execution_IAM_role.html
+  * ECS task に紐付ける
+    * task_role_arn - (Optional) The ARN of IAM role that allows your Amazon ECS container task to make calls to other AWS services.
+    * execution_role_arn - (Optional) The Amazon Resource Name (ARN) of the task execution role that the Amazon ECS container agent and the Docker daemon can assume.
+      * この後者で紐付ける
+  * EC2 cluster を使うのであれば、そちらに AmazonEC2ContainerServiceforEC2Role でも対応できるはず
+
+* https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/instance_IAM_role.html
