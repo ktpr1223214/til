@@ -129,6 +129,23 @@ $ curl http://<private_ip>:<port>/<health_check_path>
     * task_role_arn - (Optional) The ARN of IAM role that allows your Amazon ECS container task to make calls to other AWS services.
     * execution_role_arn - (Optional) The Amazon Resource Name (ARN) of the task execution role that the Amazon ECS container agent and the Docker daemon can assume.
       * この後者で紐付ける
-  * EC2 cluster を使うのであれば、そちらに AmazonEC2ContainerServiceforEC2Role でも対応できるはず
+  * EC2 cluster を使うのであれば、そちらに AmazonEC2ContainerServiceforEC2Role でも対応できるが、Task execution role で対応必要な場合もある
+    * たとえば、ECS task の envirionment で、Parameter store を復号化して使う(secrets)の場合には、task execution role に該当権限が必要
+      * [Amazon ECS シークレットで必須の IAM アクセス許可](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_execution_IAM_role.html#task-execution-secrets)
 
-* https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/instance_IAM_role.html
+### 注意
+* EC2 で ECS を動かす場合、task role と同じ権限は EC2 の IAM role に付与する必要はない
+* AmazonEC2ContainerServiceforEC2Role があれば、ECR からの pull などを ECS task が行うことができる
+* ただし、ECS task definition で task_execution_role を指定した場合には EC2 の IAM Role が、
+
+### 参考
+* [Confused by the role requirement of ECS](https://serverfault.com/questions/854413/confused-by-the-role-requirement-of-ecs)
+  * 各種 role について説明があって良さそう
+* [Amazon ECS の Amazon ECR エラー「CannotPullContainerError: API error」を解決する方法を教えてください](https://aws.amazon.com/jp/premiumsupport/knowledge-center/ecs-pull-container-api-error-ecr/)
+  * ecs pull container error from ecr
+
+## トラブルシューティング
+* EC2 cluster なら、EC2 を探し出して /var/lib/docker/containers/ 辺りからログが見られるので、確認する(ls -l で時系列をみて)
+* ログは CloudWatch logs に出しておくなりすると見やすい(勿論 fluentd などで別に飛ばす場合はその限りでない)
+* ALB を使った構成の場合は、ALB のログを S3 になりに出力しておくと、アプリへの接続がうまくいかない場合などのトラブルシューティングに役立つ
+  * そもそも ALB まではいけているのか、など
