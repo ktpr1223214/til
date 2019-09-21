@@ -67,3 +67,10 @@ $ alter table <table_name> drop primary key, add primary key(<column>);
 
 ## docker
 * [mysql](https://hub.docker.com/_/mysql/)
+
+## RDS
+``` bash
+$ sudo yum install mysql
+$ mysql -h <endpoint> -P 3306 -u <user_name> -p <db_name>
+```
+
