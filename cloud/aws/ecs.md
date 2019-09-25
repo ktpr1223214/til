@@ -127,8 +127,10 @@ $ curl http://<private_ip>:<port>/<health_check_path>
   * https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_execution_IAM_role.html
   * ECS task に紐付ける
     * task_role_arn - (Optional) The ARN of IAM role that allows your Amazon ECS container task to make calls to other AWS services.
+      * 例えば S3 への権限とか、タスク側の権限
     * execution_role_arn - (Optional) The Amazon Resource Name (ARN) of the task execution role that the Amazon ECS container agent and the Docker daemon can assume.
       * この後者で紐付ける
+      * こいつは ECS を実行する側の権限(ECR とか CWLogs とか)
   * EC2 cluster を使うのであれば、そちらに AmazonEC2ContainerServiceforEC2Role でも対応できるが、Task execution role で対応必要な場合もある
     * たとえば、ECS task の envirionment で、Parameter store を復号化して使う(secrets)の場合には、task execution role に該当権限が必要
       * [Amazon ECS シークレットで必須の IAM アクセス許可](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_execution_IAM_role.html#task-execution-secrets)
