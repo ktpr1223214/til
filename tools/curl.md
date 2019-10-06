@@ -25,6 +25,9 @@ $ curl -d "{\"hello\": \"world\"}" -H "Content-Type: application/json" http://lo
 # -d で複数送信 title=The Art of Community&author=Jono Bacon というボディとなる(各項目が & でつながれる)
 $ curl -d title="The Art of Community" -d author="Jono Bacon" http://localhost:8888
 
+# -d で引数に @- をつけると、パイプ経由でデータを渡せる
+$ cat text.txt | curl POST -d @- http://localhost:8888
+
 # URL エンコードで送付 title=The%20Art%20of%20Community&author=Jono%20Bacon というボディになる
 $ curl --data-urlencode title="The Art of Community" --data-urlencode author="Jono Bacon" http://localhost:8888
 
