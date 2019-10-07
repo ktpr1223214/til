@@ -9,6 +9,8 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus/:/etc/prometheus/
+    links:
+      - node-exporter
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/tsdb/data"
@@ -25,3 +27,13 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     links:
       - prometheus
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v0.18.0
+    container_name: node-exporter
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc
+      - /sys:/host/sys
+      - /:/rootfs
