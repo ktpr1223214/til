@@ -28,5 +28,6 @@ function prepare() {
 }
 
 function jsonnet_compile() {
-  jsonnet -J . -J vendor "$@"
+  # local の .libsonnet と vendor を見に行っている
+  jsonnet -J . -J vendor/grafonnet-lib "$@"
 }
