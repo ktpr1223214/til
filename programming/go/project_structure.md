@@ -97,4 +97,7 @@ title: Project Structure
 * [Style guideline for Go packages](https://rakyll.org/style-packages/)
     * Organize by (functional)responsibility
 * [CODE LIKE THE GO TEAM](https://talks.bjk.fyi/gcru18-best.html#/)
-    * naming conventions と package organization    
+    * naming conventions と package organization
+* [Modern Go Application example](https://github.com/sagikazarmark/modern-go-application)
+    * config/logging/error/metrics(Prometheus and Jaeger)/health check/graceful restart/daemon/messaging/db
+* [How Uber "Go"es](https://speakerdeck.com/lelenanam/how-uber-go-es)
