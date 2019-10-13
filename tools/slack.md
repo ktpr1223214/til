@@ -17,3 +17,5 @@ title: Slack
 ## tips
 * channel id の取得
   * URL copy したときに、https://~/messages/<channel id> という構成で得られる
+* private channel への bot からの post
+  * invite しておかないと、channel_not_found でエラーになるはず
