@@ -67,3 +67,7 @@ $ cat /etc/hosts
 # /etc/hosts に host 名を追加
 $ sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
 ```
+
+## Reference
+* [THE /proc FILESYSTEM](https://www.kernel.org/doc/Documentation/filesystems/proc.txt)
+* [I/O statistics fields](https://www.kernel.org/doc/Documentation/iostats.txt)

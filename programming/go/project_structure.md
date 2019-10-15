@@ -101,3 +101,7 @@ title: Project Structure
 * [Modern Go Application example](https://github.com/sagikazarmark/modern-go-application)
     * config/logging/error/metrics(Prometheus and Jaeger)/health check/graceful restart/daemon/messaging/db
 * [How Uber "Go"es](https://speakerdeck.com/lelenanam/how-uber-go-es)
+
+### clean architecture
+* [Go Microservice with Clean Architecture](https://medium.com/@jfeng45/go-microservice-with-clean-architecture-a08fa916a5db)
+    * 5. Go Microservice with Clean Architecture: Transaction Support が Transaction を真面目に考えてそうで良さげ
