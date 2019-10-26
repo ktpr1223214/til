@@ -106,3 +106,5 @@ rate と increase は、
 
 ## Reference
 * [instrumenting-go-applications](https://banzaicloud.com/blog/instrumenting-go-applications/)
+* [EXPLORING PROMETHEUS GO CLIENT METRICS](https://povilasv.me/prometheus-go-metrics/)
+  * メトリクスの解説
