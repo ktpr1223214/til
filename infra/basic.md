@@ -71,3 +71,5 @@ $ sudo sh -c 'echo 127.0.1.1 $(hostname) >> /etc/hosts'
 ## Reference
 * [THE /proc FILESYSTEM](https://www.kernel.org/doc/Documentation/filesystems/proc.txt)
 * [I/O statistics fields](https://www.kernel.org/doc/Documentation/iostats.txt)
+* [Filesystem Hierarchy Standard](http://www.pathname.com/fhs/pub/fhs-2.3.pdf)
+  * /bin とか /dev やらの解説
