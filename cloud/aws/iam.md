@@ -128,3 +128,46 @@ data "aws_iam_policy_document" "instance-policy" {
     }
 }
 ```
+
+## sts
+``` bash
+# profile 情報取得
+$ aws sts get-caller-identity
+```
+
+## aws-vault
+``` bash
+# install(brew cask でも良いはず)
+$ go get github.com/99designs/aws-vault
+$ aws-vault add <profile>
+# コマンド実行例
+$ aws-vault exec <profile> -- aws s3 ls
+# プロファイル確認
+$ aws-vault exec <profile> -- aws sts get-caller-identity
+```
+
+* プロファイルの設定追加
+  * assume role の設定(コレ自体は普通の機能)
+``` 
+[profile <profile_name>]
+
+[profile readonly-assume]
+source_profile = <profile_name>
+role_arn = arn:aws:iam::12345:role/assume-readonly
+
+[profile readonly-assume-another-account]
+source_profile = readonly-assume
+role_arn = arn:aws:iam::34567:role/assume-readonly-another-account
+```
+
+これを設定した後で、以下みたいなことも出来る(つまり、Assume のチェインを見て一時認証を secure に作ってくれる)
+``` bash
+$ aws-vault exec readonly-assume -- aws sts get-caller-identity
+$ aws-vault exec readonly-assume-another-account -- aws sts get-caller-identity
+```
+
+``` bash
+# サーバー起動
+$ aws-vault exec <profile> --server --
+$ 
+```
