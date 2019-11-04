@@ -8,11 +8,12 @@ title: Security
 * https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project
     * install
     * mac 版は Java 同伴らしいので、Java が既に入っている環境では、Cross Platform Package で良いかと
-    * ~.jar を実行し、「継続的に保存せず、必要に応じてセッションを保存」辺りを選択
-    * 
+    * ~.jar を実行し、「継続的に保存せず、必要に応じてセッションを保存」辺りを選択    
     
 ## Reference
 * [What is DevSecOps?](https://medium.com/@aditi.chaudhry92/what-is-devsecops-cb14cfd457b2)
+* [Awesome-WAF](https://github.com/0xInfection/Awesome-WAF)
+  * Everything awesome about web-application firewalls (WAF)
 
 ### AWS
 * [AWS Security Incident Response Guide](https://d1.awsstatic.com/whitepapers/aws_security_incident_response.pdf)
