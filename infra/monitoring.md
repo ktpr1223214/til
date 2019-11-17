@@ -188,6 +188,7 @@ title: Monitoring
 ### annotations
 
 ### Dashboard as code
+* [grafana-dashboards](https://github.com/adamwg/grafana-dashboards)
 
 ## alertmanager
 
