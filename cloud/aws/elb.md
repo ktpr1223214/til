@@ -14,3 +14,7 @@ $ dig <DNS name>
 * 上述の通り、DNS 名が振られて A レコードが存在している
 * なので、更に CNAME で別名を振ることも可能
     * 例えば ECS の host based routing などもここから出来る
+
+## NLB 
+* NLB と Proxy Protocol
+  * [NLB (Network Load Balancer) が Proxy Protocol に対応しました](https://dev.classmethod.jp/cloud/aws/nlb-meets-proxy-protocol-v2/)
