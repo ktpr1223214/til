@@ -44,6 +44,8 @@ title: Go
 * [Understanding Nil](https://speakerdeck.com/campoy/understanding-nil)
 * [Go Walkthrough](https://medium.com/go-walkthrough)
     * io など package について解説
+* [Go memory ballast: How I learnt to stop worrying and love the heap](https://blog.twitch.tv/en/2019/04/10/go-memory-ballast-how-i-learnt-to-stop-worrying-and-love-the-heap-26c2462549a2/)
+    * GC の話なども書いてある
 
 ## Podcast
 * [gotime](https://changelog.com/gotime)
