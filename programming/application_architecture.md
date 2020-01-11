@@ -26,9 +26,17 @@ title: Application Architecture
 * [Service LocatorとDependency InjectionパターンとDI Container](https://www.nuits.jp/entry/servicelocator-vs-dependencyinjection)
 * [UseCaseの再利用性](https://yoskhdia.hatenablog.com/entry/2016/10/18/152624)
 
+### 
+* [Write code that is easy to delete, not easy to extend.](https://programmingisterrible.com/post/139222674273/write-code-that-is-easy-to-delete-not-easy-to)
+* [Modern Software Over-Engineering Mistakes](https://medium.com/@rdsubhas/10-modern-software-engineering-mistakes-bc67fbef4fc8)
+
 ### API design
 * [API 設計ガイド](https://cloud.google.com/apis/design/)
   * ネットワーク API の一般的な設計ガイド
+
+### Test
+* [Writing a Unit Test](https://developers.mattermost.com/contribute/server/rest-api/#writing-a-unit-test)
+    * REST API のテストの観点が書いてあって参考になる
 
 ### DDD
 * [ボトムアップドメイン駆動設計](https://nrslib.com/bottomup-ddd/)

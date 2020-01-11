@@ -23,3 +23,4 @@ title: API
 
 ## Reference
 * [API 設計ガイド](https://cloud.google.com/apis/design/)
+* [WebAPIでエラーをどう表現すべき？15のサービスを調査してみた](https://qiita.com/suin/items/f7ac4de914e9f3f35884)
