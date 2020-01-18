@@ -190,8 +190,13 @@ title: Monitoring
 ### Dashboard as code
 * [grafana-dashboards](https://github.com/adamwg/grafana-dashboards)
 
-## alertmanager
-
 ## Reference
 * [The RED Method](https://grafana.com/files/grafanacon_eu_2018/Tom_Wilkie_GrafanaCon_EU_2018.pdf)
 * [The USE Method](http://www.brendangregg.com/usemethod.html)
+* [what-makes-a-good-runbook](https://www.transposit.com/blog/2019.11.14-what-makes-a-good-runbook/)
+* [The SRE I aspire to be](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_aknin.pdf)
+* [](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_abbas.pdf)
+* [Hiring Great SREs](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_rutkin.pdf)
+* [SRE & Product Management](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_wohlner.pdf)
+* [The Factors That Impact Availability, Visualized](https://www.vividcortex.com/blog/the-factors-that-impact-availability-visualized)
+  * Availability と MTBF/MTTR の関連について
