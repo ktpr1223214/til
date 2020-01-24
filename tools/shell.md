@@ -12,8 +12,12 @@ $ command1 || command2
 
 ## grep
 ``` bash
-# -e は
-$ grep -l "文字列" *.go | xargs sed -i -e 's/変換前文字列/変換後文字列/g'
+# -r つけると、recursive(なので、grep -rl とかにすれば)
+$ grep -l "文字列" *.go | xargs sed -i 'sample.bak' 's/変換前文字列/変換後文字列/g'
+# macos で、上書きする場合(-i オプションの挙動が BSD のため異なることに注意)
+$ grep -rl "'" ./common/ | xargs sed -i '' 's/変換前文字列/変換後文字列/g'
+# ex. ' を " に修正
+$ grep -rl "'" ./common/ | xargs sed -i '' "s/'/\"/g"
 ```
 
 ## EOF
