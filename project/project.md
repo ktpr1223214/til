@@ -2,6 +2,11 @@
 title: Project
 ---
 
+## ユーザーストーリー
+### Reference
+* [ユーザーストーリーとは？](https://www.slideshare.net/Ryuzee/ss-8332120)
+  * 概要 slide
+
 ## 広い諸々
 ### Reference
 * [Getting Real](https://basecamp.com/gettingreal)
@@ -21,7 +26,6 @@ Quote from You - A quote from a spokesperson in your company.
 How to Get Started - Describe how easy it is to get started.
 Customer Quote - Provide a quote from a hypothetical customer that describes how they experienced the benefit.
 Closing and Call to Action - Wrap it up and give pointers where the reader should go next.
-
 
 If the press release is more than a page and a half, it is probably too long. 
 Keep it simple. 3-4 sentences for most paragraphs. Cut out the fat. 
