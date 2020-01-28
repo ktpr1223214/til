@@ -146,6 +146,10 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * [Amazon ECS の Amazon ECR エラー「CannotPullContainerError: API error」を解決する方法を教えてください](https://aws.amazon.com/jp/premiumsupport/knowledge-center/ecs-pull-container-api-error-ecr/)
   * ecs pull container error from ecr
 
+## availability
+* [Amazon ECS availability best practices](https://aws.amazon.com/jp/blogs/containers/amazon-ecs-availability-best-practices/)
+    * これを参考に
+
 ## トラブルシューティング
 * EC2 cluster なら、EC2 を探し出して /var/lib/docker/containers/ 辺りからログが見られるので、確認する(ls -l で時系列をみて)
   * ログ確認して想定されるログが出てない場合はアプリ側の出力方法を確認(ファイルのみに出力されているなど)
