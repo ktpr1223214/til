@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.19.0
+    ports:
+      - 9093:9093
+    restart: always
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
