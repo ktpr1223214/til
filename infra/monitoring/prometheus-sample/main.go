@@ -9,19 +9,30 @@ import (
 )
 
 var (
-	requests = promauto.NewCounter(
+	helloCnt = promauto.NewCounter(
 		prometheus.CounterOpts{
-			Name: "hello_worlds_total", Help: "Hello Worlds requested.",
+			Name: "hello_total", Help: "Hello requested.",
+		})
+
+	worldCnt = promauto.NewCounter(
+		prometheus.CounterOpts{
+			Name: "world_total", Help: "World requested.",
 		})
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	requests.Inc()
-	w.Write([]byte("Hello World"))
+func hello(w http.ResponseWriter, r *http.Request) {
+	helloCnt.Inc()
+	w.Write([]byte("Hello"))
+}
+
+func world(w http.ResponseWriter, r *http.Request) {
+	worldCnt.Inc()
+	w.Write([]byte("World"))
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/world", world)
 	http.Handle("/metrics", promhttp.Handler())
 
 	log.Fatal(http.ListenAndServe(":8000", nil))
