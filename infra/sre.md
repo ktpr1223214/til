@@ -185,6 +185,15 @@ title: SRE
 * Modeling Dependencies
 * Experimenting with Relaxing Your SLOs
 
+## 実例: VALET
+* [SLO Engineering Case Studies](https://landing.google.com/sre/workbook/chapters/slo-engineering-case-studies/)
+* Automating VALET Data Collection を読む
+    * Note that our SLOs are a trending tool that we can use for error budgets,
+    but aren’t directly connected to our monitoring systems.
+    Instead, we have a variety of disparate monitoring platforms, each with its own alerting.
+    Those monitoring systems aggregate their SLOs on a daily basis and publish to the VALET service for trending.
+    The downside of this setup is that alerting thresholds set in the monitoring systems aren’t integrated with SLOs; however, we have the flexibility to change out monitoring systems as needed.
+
 ## SLO とアラート
 ### アラートで考えること
 * SLO における重要イベント: error budget の多くを消費するイベント
@@ -198,7 +207,58 @@ title: SRE
         * How long alerts fire after an issue is resolved. Long reset times can lead to confusion or to issues being ignored.
 
 ### 重要イベントをアラートするために
-* 繰り返しだが、今回の重要イベントは、error budget を多く費消してしまうようなもののこと
+* 繰り返しだが、今回の重要イベントは、error budget を多く費消してしまうようなものを指す
+
+### Target Error Rate ≥ SLO Threshold
+* (1 - SLO) / error ratio * alerting window size = detection time で、alerting window size / detection time = error ratio / (1 - SLO)
+    * ex. 100% outage(error ratio=1)だと、(1-0.999) / 1 * 10(m) * 60 = 0.6s
+    * error ratio は、alerting window size におけるエラーの割合
+    * 0.1% error rate for 10 minutes だと、これは月次エラーバジェットからみると、10 / (60 * 24 * 30) * 100 = 0.02%
+    * 144 = 6(10分に1回) * 24(時間)
+* if the SLO is 99.9% over 30 days, alert if the error rate over the previous 10 minutes is ≥ 0.1%
+* 検知は速いが、precision が低い
+
+### Increased Alert Window
+* 期間のエラーバジェットのどれだけを消費した時に通知するか、という基準で考える
+* 検知は相変わらず速く、precision も改善
+    * より長い期間の error rate を考慮するので
+* 一方 reset time が非常に悪く、計算負荷も増大
+* 1 - SLO を error ratio で消費するのに必要な alerting window size で計算
+    * ex. SLO: 99.9% alerting window size: 36h の場合、100%outage(error ratio = 1 per 36h)だと、
+    (0.001 / 1) * 36 = 0.036h で、0.036h * 60 = 2.16m
+
+### Incrementing Alert Duration
+* 同じく precision は良い
+* recall が悪く、detection time も良くない
+    * duration は、インシデントの緊急度で比例してあがるというものではないので
+    * ex. a 100% outage alerts after one hour, the same detection time as a 0.2% outage だが、前者はバジェットの140%を食いつぶす
+        * 1時間で、100%outrage なので、100 / (30 * 24 * 0.001) = 138.8 ~ 140%程度
+            * 最初の100は、一時間基準で
+    * 境界を行ったり来たりするような場合も、検知されず
+* spike の計算
+    * ((1 / 12) * 100) / (30 * 24 * 0.001) = 11.5 ~ 12%程度を spike で消費
+        * 1/12 = 5分で、100%outrage なのを1時間基準の%にして、全体%からどの程度占めるのかを計算
+
+### Alert on Burn Rate
+* x = 100 * (30 * 24 * 0.001) / 100
+    * 100%outrage で、x 時間で budget を使い切る(=100%)にするために、x * 100 / (30 * 24 * 0.001) = 100 としたく、そうなる x を求めると 0.72 で、0.72 * 60 = 43m
+    * 逆に 0.72 * 100 / (30 * 24 * 0.001) = 100
+* Five percent of a 30-day error budget spend over one hour requires a burn rate of 36.
+    * (x * 100) / (30 * 24 * 0.05) = 100 としたく、x = 36 とわかる
+* Reset time: 58 m
+* A 35x burn rate never alerts, but consumes all of the 30-day error budget in 20.5 hours.
+    * x = 100 * (30 * 24 * 0.001) / 3.5 = 20.5
+        * 3.5 * x / (30 * 24 * 0.001) = 100 となるような x
+
+### Multiple Burn Rate Alerts
+* We recommend 2% budget consumption in one hour and 5% budget consumption in six hours as reasonable starting numbers for paging, and 10% budget consumption in three days as a good baseline for ticket alerts
+
+### Multiwindow, Multi-Burn-Rate Alerts
+
+### Extreme Availability Goals
+* 高い・低い、いずれの場合においても少し特殊な扱いが必要となる
+* 高い場合だと、秒でバジェットを食いつぶすこともある
+    * canarying release などが必要に
 
 ## Runbook/Playbook
 * [maintaining-playbooks](https://landing.google.com/sre/workbook/chapters/on-call/#maintaining-playbooks)
