@@ -18,7 +18,7 @@ func TestPrometheus_Metrics(t *testing.T) {
 		t.Fatalf("failed to read response body %s", err)
 	}
 
-	t.Log("Prometheus で独自メトリクスをまだ利用していない")
+	t.Log("Prometheus で独自メトリクスをまだ計測していない")
 	{
 		if strings.Contains(string(bBody), "http_requests_total") {
 			t.Errorf("want %s not contained in response body, but got", "http_requests_total")
@@ -41,7 +41,7 @@ func TestPrometheus_Metrics(t *testing.T) {
 		t.Fatalf("failed to read response body %s", err)
 	}
 
-	t.Log("Prometheus で独自メトリクスを収集した")
+	t.Log("Prometheus で独自メトリクスを計測した")
 	{
 		if !strings.Contains(string(bBody), `http_requests_total{code="200",method="GET",path="/test"} 1`) {
 			t.Errorf("want %s contained in response body, but not got", `http_requests_total{code="200",method="GET",path="/test"} 1`)
