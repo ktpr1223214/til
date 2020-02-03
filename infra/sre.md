@@ -232,26 +232,34 @@ title: SRE
 * recall が悪く、detection time も良くない
     * duration は、インシデントの緊急度で比例してあがるというものではないので
     * ex. a 100% outage alerts after one hour, the same detection time as a 0.2% outage だが、前者はバジェットの140%を食いつぶす
-        * 1時間で、100%outrage なので、100 / (30 * 24 * 0.001) = 138.8 ~ 140%程度
+        * 1時間で、100%outrage なので、100 / (30 * 24 * 0.1) = 1.38 ~ 140%程度
             * 最初の100は、一時間基準で
     * 境界を行ったり来たりするような場合も、検知されず
 * spike の計算
-    * ((1 / 12) * 100) / (30 * 24 * 0.001) = 11.5 ~ 12%程度を spike で消費
+    * ((1 / 12) * 100) / (30 * 24 * 0.1) = 0.115 ~ 12%程度を spike で消費
         * 1/12 = 5分で、100%outrage なのを1時間基準の%にして、全体%からどの程度占めるのかを計算
 
 ### Alert on Burn Rate
-* x = 100 * (30 * 24 * 0.001) / 100
-    * 100%outrage で、x 時間で budget を使い切る(=100%)にするために、x * 100 / (30 * 24 * 0.001) = 100 としたく、そうなる x を求めると 0.72 で、0.72 * 60 = 43m
-    * 逆に 0.72 * 100 / (30 * 24 * 0.001) = 100
+* x = (30 * 24 * 0.1) / 100
+    * 100%outrage で、x 時間で budget を使い切る(=100%)にするために、x * 100 / (30 * 24 * 0.1) = 1 としたく、そうなる x を求めると 0.72 で、0.72 * 60 = 43m
+    * 逆に 0.72 * 100 / (30 * 24 * 0.1) = 1
 * Five percent of a 30-day error budget spend over one hour requires a burn rate of 36.
-    * (x * 100) / (30 * 24 * 0.05) = 100 としたく、x = 36 とわかる
+    * x = 0.05 * (30 * 24 * 0.1) から x = 3.6となり、burn rate = x * 10 = 36となる
+        * x * 1 / (30 * 24 * 0.1) = 0.05 としたい
+            * 1時間での error rate x を求めて、そこから burn rate を求める
 * Reset time: 58 m
 * A 35x burn rate never alerts, but consumes all of the 30-day error budget in 20.5 hours.
-    * x = 100 * (30 * 24 * 0.001) / 3.5 = 20.5
-        * 3.5 * x / (30 * 24 * 0.001) = 100 となるような x
+    * x = 1 * (30 * 24 * 0.1) / 3.5 = 20.5
+        * 3.5 * x / (30 * 24 * 0.1) = 1 となるような x を求めるということから
+        * 3.5 は burn rate 35 のときの error rate
 
 ### Multiple Burn Rate Alerts
 * We recommend 2% budget consumption in one hour and 5% budget consumption in six hours as reasonable starting numbers for paging, and 10% budget consumption in three days as a good baseline for ticket alerts
+    * x = 0.02 * (30 * 24 * 0.1)
+        * x / (30 * 24 * 0.1) = 0.02(=2%) となるような x (= 1時間 x error rate と考えて)
+        を求めると、x = 1.44 つまり burn rate = x * 10 = 14.4となる
+        * かけるのが10なのは、SLO の基準となる error rate と burn rate の関係による
+    * x = 0.05 * (30 * 24 * 0.1) / 6 に burn rate = x * 10 = 6
 
 ### Multiwindow, Multi-Burn-Rate Alerts
 
