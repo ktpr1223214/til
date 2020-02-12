@@ -156,4 +156,6 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * ログは CloudWatch logs に出しておくなりすると見やすい(勿論 fluentd などで別に飛ばす場合はその限りでない)
 * ALB を使った構成の場合は、ALB のログを S3 になりに出力しておくと、アプリへの接続がうまくいかない場合などのトラブルシューティングに役立つ
   * そもそも ALB まではいけているのか、など
-
+* EC2 インスタンスが cluster に入らない場合
+  * /etc/ecs/ecs.config に適切に cluster name が設定されているかどうか
+  * tail /var/log/ecs/ecs-agent.log.... を確認し、エラーを吐いているか
