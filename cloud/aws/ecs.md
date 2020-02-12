@@ -159,3 +159,5 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * EC2 インスタンスが cluster に入らない場合
   * /etc/ecs/ecs.config に適切に cluster name が設定されているかどうか
   * tail /var/log/ecs/ecs-agent.log.... を確認し、エラーを吐いているか
+  * EC2 instance は public ip を持つなど、ECS service endpoint との通信手段が必要なことに注意
+    * cf. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html#container_instance_concepts
