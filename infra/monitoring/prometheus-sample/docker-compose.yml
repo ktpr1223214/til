@@ -15,6 +15,17 @@ services:
     links:
       - alertmanager
       - pushgateway
+      - node-exporter
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v0.18.0
+    container_name: node-exporter
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc
+      - /sys:/host/sys
+      - /:/rootfs
 
   pushgateway:
     image: prom/pushgateway:v0.8.0
