@@ -95,6 +95,7 @@ dashboard.new(
     hide='label',
   )
 )
+
 # https://github.com/grafana/grafonnet-lib/blob/69bc267211790a1c3f4ea6e6211f3e8ffe22f987/grafonnet/template.libsonnet#L2
 # instance という名前の variables を $PROMETHEUS_DS という datasource(上で定義した)から、
 # label_values(prometheus_build_info, instance) というクエリで定義
