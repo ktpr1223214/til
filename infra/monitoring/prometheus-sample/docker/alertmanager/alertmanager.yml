@@ -1,0 +1,41 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: "webhook"
+  group_by: ["service"]
+  # How long to wait to buffer alerts of the same group before sending initially.
+  # bundle alerts for first notification
+  # 30s が default
+  # この秒数の多寡に議論があるのであれば、そもそも対応も自動化しろって話（人間対応が必要な場合に数十秒の違いでそんな違いは生じないだろうということ）
+  # ただし、テスト用で短くしている(以下同様)
+  group_wait: 10s
+  # How long to wait before sending an alert that has been added to a group which contains already fired alerts.
+  # send notification for new or resolved alerts
+  # 5m が default
+  group_interval: 10s
+  # How long to wait before re-sending a given alert that has already been sent.
+  # remind users that alerts are still firing
+  # critical 基準として、4h あれば何かしら出来ているだろうという期待で
+  # 4h が default
+  repeat_interval: 4h
+
+  routes:
+  - match:
+      severity: critical
+    receiver: "webhook"
+  - match:
+      severity: warning
+    group_by: ["alertname"]
+    receiver: "webhook-ticket"
+    group_interval: 1d
+    repeat_interval: 1d
+
+receivers:
+  - name: "webhook"
+    webhook_configs:
+      - url: "http://host.docker.internal:4000/webhook"
+
+  - name: "webhook-ticket"
+    webhook_configs:
+      - url: "http://host.docker.internal:4000/ticket"

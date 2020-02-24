@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 2s
+  scrape_timeout: 1s
+  evaluation_interval: 2s
+
+  external_labels:
+    prometheus_server: "localhost"
+
+alerting:
+  alert_relabel_configs:
+    - source_labels: [prometheus_server]
+      target_label: prometheus_server
+      replacement: prome
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - "test_alert_rules.yml"
+
+scrape_configs:
+  - job_name: "prometheus server"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "pushgateway"
+    static_configs:
+      - targets: ["pushgateway:9091"]
+
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]

@@ -1,0 +1,61 @@
+groups:
+- name: local-dev
+  rules:
+
+  # cf. https://alex.dzyoba.com/blog/prometheus-alerts/
+  # cf. https://www.robustperception.io/alerting-on-down-instances
+  - alert: Node down
+    expr: up{exported_job="node_exporter"} == 0
+    for: 2s
+    labels:
+      severity: critical
+      service: fuga
+    annotations:
+      title: Node {{ $labels.instance }} is down
+      description: Failed to scrape {{ $labels.job }} on {{ $labels.instance }} for more than 3 minutes. Node seems down.
+      runbook: http://runbook.com
+      ngraph: http://graph.com
+
+  - alert: FugaServiceDown
+    expr: up{service="fuga"} == 0
+    for: 2s
+    labels:
+      severity: critical
+      service: fuga
+    annotations:
+      summary: Fuga の URL 監視が失敗しました
+      description: Fuga の URL `{{ $labels.instance }}` が5分間応答を返していません
+      runbook: http://runbook.com
+      graph: http://graph.com
+
+  - alert: HogeServiceDown
+    expr: up{service="hoge"} == 0
+    for: 2s
+    labels:
+      severity: critical
+      service: hoge
+    annotations:
+      summary: Hoge の URL 監視が失敗しました
+      description: Hoge の URL `{{ $labels.instance }}` が5分間応答を返していません
+      runbook: http://runbook.com
+      graph: http://graph.com
+
+  - alert: PiyoSomethingWrong
+    expr: up{service="piyo"} == 1
+    for: 2s
+    labels:
+      severity: warning
+      service: piyo
+    annotations:
+      summary: Piyo の 何かがおかしいです
+      description: Piyo の 何かがおかしいです
+
+  - alert: PiyoSomethingWrong2
+    expr: up{service="piyo"} == 1
+    for: 2s
+    labels:
+      severity: warning
+      service: piyo
+    annotations:
+      summary: Piyo の 何かがおかしいです2
+      description: Piyo の 何かがおかしいです2
