@@ -190,7 +190,39 @@ title: Monitoring
 ### Dashboard as code
 * [grafana-dashboards](https://github.com/adamwg/grafana-dashboards)
 
+## モニタリングの意義
+* Alert on conditions that require attention.
+* Investigate and diagnose those issues.
+* Display information about the system visually.
+* Gain insight into trends in resource usage or service health for long-term planning.
+* Compare the behavior of the system before and after a change, or between two groups in an experiment.
+
+## 症状と原因(Symptoms vs Causes)
+* モニタリングシステムが答える必要のある2つの疑問
+    * 何が壊れたのか・なぜそれが壊れたのか
+* 「何が」と「なぜ」の区別はモニタリングルールを書く上で最も重要な区別
+* ちなみに昔は、この区別はあまり意識することはなかった
+    * ex. web server down(cause) で、サイトダウン(symptom)なので、単にアラート
+    * 今は 1 server down でページレベルのアラートを出すことはないこともごく一般的な話
+* Paging alerts, those that wake you up in the night, should be based on symptoms, i.e. something that actively or imminently impacts the user experience
+
+## ブラックボックスとホワイトボックス
+* Google では、ホワイトボックスモニタリングを多用し、一部重要な部分でブラックスボックスモニタリングを行っている
+* ブラックボックスは「現在、システムが正常に動作していない」というような症状を扱う
+    * symptom-oriented なので、ページングとして人の対応が必要というのを強制できるメリットがある
+* ホワイトボックスは、ログや HTTP エンドポイントなど、システム内部を調査する機能に依存
+    * よって、リトライでマスクされてしまっているような障害や、近々生じそうな問題の検出も可能
+* 多層的なシステムに於いては、ある人にとっての symptom が別の人にとって、 cause であることがある
+    * ex. 低速な DB 読み込みは、DB SRE にとっては symptom で、frontend SRE にとっては、cause
+    * よって、ホワイトボックスモニタリングは symptom-oriented なときもあり、cause-oriented なときもある
+
+## USE method
+## 【事例】gitlab
+* [runbooks](https://gitlab.com/gitlab-com/runbooks)
+
 ## Reference
+* [My Philosophy on Alerting](https://docs.google.com/document/d/199PqyG3UsyXlwieHaqbGiWVa8eMWi8zzAn0YfcApr8Q/edit)
+    * 考え方がまとまっていて良い
 * [The RED Method](https://grafana.com/files/grafanacon_eu_2018/Tom_Wilkie_GrafanaCon_EU_2018.pdf)
 * [The USE Method](http://www.brendangregg.com/usemethod.html)
 * [what-makes-a-good-runbook](https://www.transposit.com/blog/2019.11.14-what-makes-a-good-runbook/)
@@ -200,3 +232,6 @@ title: Monitoring
 * [SRE & Product Management](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_wohlner.pdf)
 * [The Factors That Impact Availability, Visualized](https://www.vividcortex.com/blog/the-factors-that-impact-availability-visualized)
   * Availability と MTBF/MTTR の関連について
+* [Monitoring Theory](http://widgetsandshit.com/teddziuba/2011/03/monitoring-theory.html)
+  * informative/actionable の定義・分類と実例
+  * とても良い
