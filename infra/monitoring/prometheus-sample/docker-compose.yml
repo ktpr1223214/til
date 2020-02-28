@@ -44,3 +44,12 @@ services:
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"
+
+  grafana:
+    image: grafana/grafana:6.4.0
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    links:
+      - prometheus
