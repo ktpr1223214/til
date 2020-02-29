@@ -210,13 +210,26 @@ ALERTS{environment="develop", severity="notice", alertstate="firing"}
     * read ver
 
 ## Label 設計
-### ラベルの生成流れ
+* ラベルの生成流れ
+### ターゲット作成まで
 * [Life of a Label](https://www.robustperception.io/life-of-a-label)
 1. service discovery
-2. 
+2. relabel_configs を反映・drop/keep actions も
+3. __address__ の port 判定や、__meta_ ラベルの除去
+4. instance ラベルの設定
+5. ターゲット作成
 
-### スクレイピングの流れ
-1. 
+### スクレイピング処理
+1. URL を生成
+    * scheme: __scheme__ host: __address__ path: __metrics_path__ params: __param_* + config
+2. スクレイプ実行
+3. スクレイプから得られる個別のラベル(インストルメンテーションラベル)について
+    * ターゲットラベルに存在しない → 追加
+    * ターゲットラベルに存在
+        * → honor_labels が設定されている → インストルメンテーションラベルを優先し、追加
+        * → honor_labels が設定されていない → exported_ という prefix を該当ラベルに追加
+4. metric_relabel_configs を適用
+5. up と scrape_duration_seconds with target labels で終了
 
 ### ターゲットラベル
 * ターゲットが何かを教えてくれるラベル
@@ -249,6 +262,16 @@ ALERTS{environment="develop", severity="notice", alertstate="firing"}
         * [Exposing the software version to Prometheus](https://www.robustperception.io/exposing-the-software-version-to-prometheus)
 * [why-cant-i-use-the-nodename-of-a-machine-as-the-instance-label](https://www.robustperception.io/why-cant-i-use-the-nodename-of-a-machine-as-the-instance-label)
     * シンプルに、ターゲットラベルは service discovery + relabeling 段階で決まるもので、つまりスクレイピングが実際に行われる前だから
+* [Target labels, not metric name prefixes](https://www.robustperception.io/target-labels-not-metric-name-prefixes)
+    * Services are not distinguished by their metric names in Prometheus.
+    * 一般に Prometheus ではメトリクスの名前はアプリやデプロイには紐付かない
+        * これによって、様々なアプリに渡って集計が出来る
+        * ex. RPC library の作者からは、そういった様々なアプリの集約が出来ると非常に嬉しい
+        * メトリクスを使うのは、アプリの開発者だけではない！
+    * では、例えば process_cpu_seconds_total をどうやって自分の気にするアプリのものからだと判断するのか？
+        * ターゲットラベルを使う！
+            * job/instance label
+    * So if you're trying to prefix all the names on a /metrics, look to target labels instead.
 
 ### Job Label 設計
 * job ラベルは、同じ目的を持つ一連のインスタンスを示し、一般にすべて同じバイナリと構成で実行される。instance ラベルは、ジョブのなかのひとつのインスタンスを識別する。
