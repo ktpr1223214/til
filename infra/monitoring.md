@@ -78,7 +78,6 @@ title: Monitoring
 
 #### 種別
 * counter
-    * 
     * 知りたいのはどのようなペースで増えるか
 * gauge
     * 何らかの状態のスナップショットの値
@@ -86,8 +85,6 @@ title: Monitoring
 * summary
     * イベントの何らかのサイズ(非負数値)
 * histogram
-    * 
-* 
 
 #### 命名
 * <ライブラリ>\_<名前>\_<単位>\_<サフィックス>
@@ -205,6 +202,7 @@ title: Monitoring
     * ex. web server down(cause) で、サイトダウン(symptom)なので、単にアラート
     * 今は 1 server down でページレベルのアラートを出すことはないこともごく一般的な話
 * Paging alerts, those that wake you up in the night, should be based on symptoms, i.e. something that actively or imminently impacts the user experience
+* この辺りは、Reference の My Philosophy on Alerting が詳しい
 
 ## ブラックボックスとホワイトボックス
 * Google では、ホワイトボックスモニタリングを多用し、一部重要な部分でブラックスボックスモニタリングを行っている
@@ -217,12 +215,14 @@ title: Monitoring
     * よって、ホワイトボックスモニタリングは symptom-oriented なときもあり、cause-oriented なときもある
 
 ## USE method
+
 ## 【事例】gitlab
 * [runbooks](https://gitlab.com/gitlab-com/runbooks)
 
 ## Reference
 * [My Philosophy on Alerting](https://docs.google.com/document/d/199PqyG3UsyXlwieHaqbGiWVa8eMWi8zzAn0YfcApr8Q/edit)
     * 考え方がまとまっていて良い
+    * Symptom/Cause の話もそうだが、 Tickets, Reports and Email/ Tracking & Accountability とかも必読
 * [The RED Method](https://grafana.com/files/grafanacon_eu_2018/Tom_Wilkie_GrafanaCon_EU_2018.pdf)
 * [The USE Method](http://www.brendangregg.com/usemethod.html)
 * [what-makes-a-good-runbook](https://www.transposit.com/blog/2019.11.14-what-makes-a-good-runbook/)
@@ -235,3 +235,10 @@ title: Monitoring
 * [Monitoring Theory](http://widgetsandshit.com/teddziuba/2011/03/monitoring-theory.html)
   * informative/actionable の定義・分類と実例
   * とても良い
+* [Customizing alertmanager notifications](https://promcon.io/2018-munich/slides/lightning-talks-day2-01_customizing-alertmanager-notifications.pdf)
+  * 本題は兎も角 ticket 使えという話
+
+### 実装例
+* [dispatch](https://github.com/Netflix/dispatch)
+  * All of the ad-hoc things you're doing to manage incidents today, done for you, and much more!
+  * Netflix のインシデント管理ツール
