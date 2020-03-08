@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -17,6 +18,14 @@ var (
 		prometheus.CounterOpts{
 			Name: "http_requests_total",
 			Help: "The number of HTTP requests processed, labeled with status code, HTTP method and URL path.",
+		},
+		[]string{"code", "method", "path"},
+	)
+
+	reqDur = promauto.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name: "http_request_duration_seconds",
+			Help: "The latency of HTTP requests processed, labeled with status code, HTTP method and URL path.",
 		},
 		[]string{"code", "method", "path"},
 	)
@@ -72,6 +81,7 @@ func instrumentRequest(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
+		s := time.Now()
 
 		rl := &responseLogger{w: w, status: http.StatusOK}
 
@@ -79,6 +89,8 @@ func instrumentRequest(h http.Handler) http.Handler {
 
 		status := strconv.Itoa(rl.status)
 		reqCnt.WithLabelValues(status, r.Method, r.URL.Path).Inc()
+		// nanosecond を 1e9 で割って second
+		reqDur.WithLabelValues(status, r.Method, r.URL.Path).Observe(float64(time.Since(s)) / float64(time.Second))
 	})
 }
 
