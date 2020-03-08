@@ -205,18 +205,21 @@ title: SRE
         * How long it takes to send notifications in various conditions. Long detection times can negatively impact the error budget.
     * Reset time
         * How long alerts fire after an issue is resolved. Long reset times can lead to confusion or to issues being ignored.
+        * これはこのあと見ていけばよく分かる
 
 ### 重要イベントをアラートするために
-* 繰り返しだが、今回の重要イベントは、error budget を多く費消してしまうようなものを指す
+* 繰り返しだが、今回の重要イベントは、エラーバジェットを多く費消してしまうようなものを指す
 
 ### Target Error Rate ≥ SLO Threshold
+* 以下では、reporting period := 30days
+* if the SLO is 99.9% over 30 days, alert if the error rate over the previous 10 minutes is ≥ 0.1%
+    * 検知は速いが、precision が低い
+* error rate is equal to the SLO のときにアラートということは、エラーバジェットを alerting window size / reporting period 費消したということ
+    * ex. 0.1% error rate for 10 minutes だと、10 / (60 * 24 * 30) * 100 = 0.02%
 * (1 - SLO) / error ratio * alerting window size = detection time で、alerting window size / detection time = error ratio / (1 - SLO)
     * ex. 100% outage(error ratio=1)だと、(1-0.999) / 1 * 10(m) * 60 = 0.6s
     * error ratio は、alerting window size におけるエラーの割合
-    * 0.1% error rate for 10 minutes だと、これは月次エラーバジェットからみると、10 / (60 * 24 * 30) * 100 = 0.02%
     * 144 = 6(10分に1回) * 24(時間)
-* if the SLO is 99.9% over 30 days, alert if the error rate over the previous 10 minutes is ≥ 0.1%
-* 検知は速いが、precision が低い
 
 ### Increased Alert Window
 * 期間のエラーバジェットのどれだけを消費した時に通知するか、という基準で考える
@@ -224,7 +227,8 @@ title: SRE
     * より長い期間の error rate を考慮するので
 * 一方 reset time が非常に悪く、計算負荷も増大
 * 1 - SLO を error ratio で消費するのに必要な alerting window size で計算
-    * ex. SLO: 99.9% alerting window size: 36h の場合、100%outage(error ratio = 1 per 36h)だと、
+    * 1 - SLO と error ratio が等しい場合に、(上にも書いたが) 1 - SLO より何倍 ratio があるか、で割れば良い
+    * ex. SLO: 99.9% alerting window size: 36h の場合、100% outage(error ratio = 1)だと、
     (0.001 / 1) * 36 = 0.036h で、0.036h * 60 = 2.16m
 
 ### Incrementing Alert Duration
@@ -232,36 +236,63 @@ title: SRE
 * recall が悪く、detection time も良くない
     * duration は、インシデントの緊急度で比例してあがるというものではないので
     * ex. a 100% outage alerts after one hour, the same detection time as a 0.2% outage だが、前者はバジェットの140%を食いつぶす
-        * 1時間で、100%outrage なので、100 / (30 * 24 * 0.1) = 1.38 ~ 140%程度
-            * 最初の100は、一時間基準で
+        * 1時間で、100%outrage なので、1 / (30 * 24 * 0.001) = 1.38 ~ 140%程度
+            * 最初の1は、一時間基準で。error budget 量で考えて単位は1とすれば分母が1ヶ月での総量(h 単位)で、分子が100%の場合に1時間で消費した量
     * 境界を行ったり来たりするような場合も、検知されず
 * spike の計算
-    * ((1 / 12) * 100) / (30 * 24 * 0.1) = 0.115 ~ 12%程度を spike で消費
-        * 1/12 = 5分で、100%outrage なのを1時間基準の%にして、全体%からどの程度占めるのかを計算
+    * (1 / 12) / (30 * 24 * 0.001) = 0.115 ~ 12%程度を spike で消費
+        * 1/12 = 5分
 
 ### Alert on Burn Rate
-* x = (30 * 24 * 0.1) / 100
-    * 100%outrage で、x 時間で budget を使い切る(=100%)にするために、x * 100 / (30 * 24 * 0.1) = 1 としたく、そうなる x を求めると 0.72 で、0.72 * 60 = 43m
-    * 逆に 0.72 * 100 / (30 * 24 * 0.1) = 1
-* Five percent of a 30-day error budget spend over one hour requires a burn rate of 36.
-    * x = 0.05 * (30 * 24 * 0.1) から x = 3.6となり、burn rate = x * 10 = 36となる
-        * x * 1 / (30 * 24 * 0.1) = 0.05 としたい
-            * 1時間での error rate x を求めて、そこから burn rate を求める
+* detection time と precision の両立のために burn rate という概念を導入
+    * burn rate: SLO に対して、エラーバジェットを費消する速さがどれだけなのか
+* burn rate は、window size と何%のエラーバジェット費消でアラートにするかを決めることで計算される
+    * ex. window size: 1h で5%エラーバジェット費消を検知するとした場合、
+    reporting period: 30days なので、b(burn rate) * 1h / 30 * 24(h) = 0.05 -> b = 0.05 * 30 * 24 = 36
+    となり、burn rate 36
+* (1 - SLO) / error ratio * alerting window size * burn rate がアラート発火までの時間
+* burn rate * alerting window size / period が、アラート発火までに費消したエラーバジェット
+* 1000 * x(h) / (30 * 24) = 1 となる x = 0.72(h)で、0.72 * 60 = 43m
 * Reset time: 58 m
+    * 36 * 0.001 * 100 で、3.6%がアラートの基準であった
+    * 60m window で、2m の error rate が1(100%)、それ以外0だと考えると、結局58m 経過した時点での
+     2 / 60 = 0.033..で、アラートの基準を割る(エラー・リクエストの絶対数がいくらかは関係ない)
 * A 35x burn rate never alerts, but consumes all of the 30-day error budget in 20.5 hours.
-    * x = 1 * (30 * 24 * 0.1) / 3.5 = 20.5
-        * 3.5 * x / (30 * 24 * 0.1) = 1 となるような x を求めるということから
-        * 3.5 は burn rate 35 のときの error rate
+    * 35 * x / 30 * 24 = 1 -> x = 20.57...
+        * burn rate 基準で考えれば、SLO の % は計算には関係しない
+* shorter time window で利用できるし、detection time も良い
+* 一方で、low recall(ex. 上の35burn rate)・reset time もまだ長い
 
 ### Multiple Burn Rate Alerts
-* We recommend 2% budget consumption in one hour and 5% budget consumption in six hours as reasonable starting numbers for paging, and 10% budget consumption in three days as a good baseline for ticket alerts
-    * x = 0.02 * (30 * 24 * 0.1)
-        * x / (30 * 24 * 0.1) = 0.02(=2%) となるような x (= 1時間 x error rate と考えて)
-        を求めると、x = 1.44 つまり burn rate = x * 10 = 14.4となる
-        * かけるのが10なのは、SLO の基準となる error rate と burn rate の関係による
-    * x = 0.05 * (30 * 24 * 0.1) / 6 に burn rate = x * 10 = 6
+* アイディア: Fast burning は素早く検知され、Slow burning はより長い time window を必要とする
+    * https://developers.soundcloud.com/blog/alerting-on-slos
+* 複数の burn rate/time window で、burn rate の利点を持ちつつ、lower error rate も見逃さないようにする
+* start point としてオススメ:
+    * paging: 2% budget consumption in one hour and 5% budget consumption in six hours
+    * tickets: 10% budget consumption in three days as a good baseline
+* b = 0.02 * (30 * 24 * 0.1)
+    * b / (30 * 24) = 0.02(=2%) となるような b を求めると、b = 14.399.. つまり burn rate: 14.4となる
+* b = 0.05 * (30 * 24) / 6 で b = 6.0 から burn rate: 6
+    * b * 6(h) / (30 * 24) = 0.05から
+* good precision/recall で、色々調整も効く
+* 一方で、調整すべきパラメータが増え、複数アラートが発火する関係で、suppression も必要に。
+また、reset time は 3day といった長期間のものをいれた関係で長くなる
 
 ### Multiwindow, Multi-Burn-Rate Alerts
+* 今実際に budget burning しているときにのみ知らせてほしい
+    * short window のチェックを組み込む
+* short window の長さは long window の 1/12 の長さがベースライン
+* (0.001) / 0.15 * 60 * 14.4 = 5.76m
+* parameter recommendation
+    * severity/long window/short window/burn rate/error budget consumed
+    * Page/1 hour/5 minutes/14.4/2%
+    * Page/6 hours/30 minutes/6/5%
+    * Ticket/1 days/2 hours/3/10%
+    * Ticket/3 days/6 hours/1/10%
+* good precision/recall で flexible
+* 一方で、複雑
+    * request の種別でいくつか group 化けて、同じグループ内での parameter 共通化という方法もあり
+    * cf. SRE workbook ch5. Alerting at Scale
 
 ### Extreme Availability Goals
 * 高い・低い、いずれの場合においても少し特殊な扱いが必要となる
