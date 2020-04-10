@@ -237,6 +237,12 @@ title: Monitoring
   * とても良い
 * [Customizing alertmanager notifications](https://promcon.io/2018-munich/slides/lightning-talks-day2-01_customizing-alertmanager-notifications.pdf)
   * 本題は兎も角 ticket 使えという話
+* [The Art of SLOs](https://landing.google.com/sre/resources/practicesandprocesses/art-of-slos/)
+  * SLO の Workshop 資料
+* [モダンなシステムにSLI/SLOを設定するときのベストプラクティス](https://blog.newrelic.co.jp/engineering/best-practices-for-setting-slos-and-slis-for-modern-complex-systems/)
+  * 良い
+* [Datadog を利用して SLO を管理しよう！](https://dev.classmethod.jp/articles/slo-monitoring-tracking-by-datadog/)
+  * 参考として
 
 ### 実装例
 * [dispatch](https://github.com/Netflix/dispatch)
