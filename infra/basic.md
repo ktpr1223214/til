@@ -6,6 +6,9 @@ title: Infra basic
 * cpu
     * utilization
         * 使っている or not の 0/1 なので、その一定時間の平均を utilization としている
+    * iowait について
+      * [Why CPU spent time on IO(wa)?
+](https://serverfault.com/questions/684339/why-cpu-spent-time-on-iowa)
 
 ### コマンド
 * 
