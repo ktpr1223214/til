@@ -591,7 +591,8 @@ top:
 	// Normal goroutines will check for need to wakeP in ready,
 	// but GCworkers and tracereaders will not, so the check must
 	// be done here instead.
-	tryWakeP := false
+    tryWakeP := false
+    // comment: こっからは、どっかで gp が != nil になるまでいくつかのパターンを見に行く形
 	if trace.enabled || trace.shutdown {
 		gp = traceReader()
 		if gp != nil {
