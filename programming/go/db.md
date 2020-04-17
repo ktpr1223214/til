@@ -21,3 +21,6 @@ title: DB
 * [To ORM or not to ORM](https://eli.thegreenplace.net/2019/to-orm-or-not-to-orm/)
 * [Go database/sql tutorial](http://go-database-sql.org/index.html)
 * [Illustrated guide to SQLX](http://jmoiron.github.io/sqlx/)
+* [Configuring sql.DB for Better Performance](https://www.alexedwards.net/blog/configuring-sqldb)
+  * [Re: Configuring sql.DB for Better Performance](http://dsas.blog.klab.org/archives/2018-02/configure-sql-db.html)
+    * こちらの方が良いかも
