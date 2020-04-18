@@ -26,9 +26,11 @@ title: Application Architecture
 * [Service LocatorとDependency InjectionパターンとDI Container](https://www.nuits.jp/entry/servicelocator-vs-dependencyinjection)
 * [UseCaseの再利用性](https://yoskhdia.hatenablog.com/entry/2016/10/18/152624)
 
-### 
+### architecture
 * [Write code that is easy to delete, not easy to extend.](https://programmingisterrible.com/post/139222674273/write-code-that-is-easy-to-delete-not-easy-to)
 * [Modern Software Over-Engineering Mistakes](https://medium.com/@rdsubhas/10-modern-software-engineering-mistakes-bc67fbef4fc8)
+* [Ready for changes with Hexagonal Architecture](https://netflixtechblog.com/ready-for-changes-with-hexagonal-architecture-b315ec967749)
+  * Netflix
 
 ### API design
 * [API 設計ガイド](https://cloud.google.com/apis/design/)
