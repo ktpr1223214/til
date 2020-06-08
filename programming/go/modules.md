@@ -92,6 +92,7 @@ $ go mod why <package>
 * Firstly github.com/davecgh/go-spew: の部分
   * パッケージの transitive dependencies の中では、github.com/davecgh/go-spew/spew を import している部分がない、ってことなのか
   * 素直に見ると、github.com/sirupsen/logrus.test から assert の流れで依存なので、テスト含めた形でのモジュール依存はしているが、パッケージの transitive dependencies にそれが現れてこない、っていうのはそれはそうな気がする
+  * 雑に言えば、list でみるより mod の方がより色々深くみているはずなので
 
 * Secondly, github.com/kr/pty: の部分
   * This tells us that there is no package from the github.com/kr/pty module in the transitive import graph of of the main module
@@ -123,3 +124,14 @@ $ go mod why <package>
     * Security
     * Licensing
     * Dependencies
+      * Adapting Leslie Lamport’s observation about distributed systems, a dependency manager can easily create a situation in which the failure of a package you didn’t even know existed can render your own code unusable
+  * Abstract the dependency
+    * it makes sense to define an interface of your own, along with a thin wrapper implementing that interface using the dependency
+    * Note that the wrapper should include only what your project needs from the dependency, not everything the dependency offers. Ideally, that allows you to substitute a different, equally appropriate dependency later, by changing only the wrapper
+  * Avoid the dependency
+    * If you only need a tiny fraction of a dependency, it may be simplest to make a copy of what you need (preserving appropriate copyright and other legal notices, of course)
+    * The Go developer community has a proverb about this: “A little copying is better than a little dependency
+  * Upgrade the dependency
+    * 昔は、動いているものに手をいれないことがよく言われていた。アップグレードすると新しいバグを入れるかもしれないからだが、これは 2 つのリスクを見落としており現在では望ましくない
+      * The first is the cost of the eventual upgrade. In software, the difficulty of making code changes does not scale linearly: making ten small changes is less work and easier to get right than making one equivalent large change
+      * The second is the cost of discovering already-fixed bugs the hard way. Especially in a security context, where known bugs are actively exploited, every day you wait is another day that attackers can break in
