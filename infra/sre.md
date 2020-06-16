@@ -317,6 +317,8 @@ title: SRE
 * [Hiring Great SREs](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_rutkin.pdf)
 * [SRE & Product Management](https://www.usenix.org/sites/default/files/conference/protected-files/srecon19emea_slides_wohlner.pdf)
 * [Training Site Reliability Engineers: What Your Organization Needs to Create a Learning Program](https://landing.google.com/sre/resources/practicesandprocesses/training-site-reliability-engineers/)
+* [サイト信頼性エンジニアリングのドキュメント](https://docs.microsoft.com/ja-jp/azure/site-reliability-engineering/)
+  * リンク集
 
 ### Runbook
 * [Writing Runbook Documentation When You’re An SRE](https://www.transposit.com/blog/2020.01.30-writing-runbook-documentation-when-youre-an-sre/)
