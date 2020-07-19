@@ -1,0 +1,6 @@
+dn: cn=taro,ou=people,dc=sample,dc=com
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: taro
+userPassword:: aG9nZQ==
+description: taro-san

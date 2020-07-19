@@ -1,0 +1,5 @@
+dn: ou=people,dc=sample,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+description: Fictional organizational unit for example purposes

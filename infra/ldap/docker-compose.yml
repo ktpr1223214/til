@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  ldap-server:
+    image: osixia/openldap:1.4.0    
+    environment:
+      LDAP_ORGANISATION: "Sample Company"
+      LDAP_DOMAIN: "sample.com"
+      LDAP_ADMIN_PASSWORD: "pass"
+    ports:
+      - "389:389"
+      - "636:636"
