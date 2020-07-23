@@ -38,3 +38,22 @@ cat <<EOF > test.txt
 }
 EOF
 ```
+
+## timezone
+``` bash
+# timezone 設定
+$ timedatectl set-timezone Asia/Tokyo
+```
+
+## locale
+``` bash
+# locale 設定
+$ localectl set-locale LANG=ja_JP.utf8
+```
+
+## script
+``` bash
+# script makes a typescript of everything printed on your terminal
+# -q で、開始・終了を stdout には出さない
+$ script -q
+```
