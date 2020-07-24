@@ -158,6 +158,44 @@ $ curl http://169.254.169.254/latest/meta-data/block-device-mapping/
 * インスタンスにアタッチされているボリュームの設定は動的に変更可能
 * インスタンスにボリュームをアタッチする場合の、ボリュームのデバイス名について
   * [Linux インスタンスでのデバイスの名前付け](https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/device_naming.html)
+* ボリュームを使えるようにする手順
+  * [Linux で Amazon EBS ボリュームを使用できるようにする](https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/ebs-using-volumes.html)
+``` bash
+# 現在利用できるブロックデバイスを一覧表示（/dev/ プレフィックスは除外される）
+$ lsblk
+
+# file: determine file type
+# Normally, file only attempts to read and determine the type of argument files which stat(2) reports are ordinary files.  This prevents problems, because reading special files may have peculiar consequences.  Specifying the -s option causes file to also read argument files which are block or character special files.  This is useful for determining the filesystem types of the data in raw disk partitions, which are block special files.
+# /dev/xvdb は 1 例
+$ sudo file -s /dev/xvdb
+
+# ファイルシステム実構築の場合のみ
+# mkfs: build a Linux filesystem
+# -t: Specify the type of filesystem to be built
+$ sudo mkfs -t xfs /dev/xvdb
+
+# ボリュームのマウントポイントディレクトリを作成
+$ sudo mkdir /data
+
+# もし、/data に何かを先に書き込んでいて場合は、マウント時に見えなくなる
+# マウント
+$ sudo mount /dev/xvdb /data
+# 確認（どっちでも）
+$ df -Th
+$ lsblk
+
+# アンマウント（書き込んでいたデータは戻る）
+$ sudo umount /data
+
+# マウントを永続化したい場合
+# /dev/xvdb /data xfs defaults,nofail 0 0
+# などを書き込む
+$ sudo vi /etc/fstab
+$ sudo unmout /data
+$ sudo mount -a
+# うまくいっていれば、マウントされる
+```
+* [ボリュームサイズ変更後の Linux ファイルシステムの拡張](https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html)
 
 ### ブロックデバイスマッピング
 * ブロックデバイスは、一連のバイトまたはビット (ブロック) でデータを移動するストレージデバイス
