@@ -48,3 +48,6 @@ FAQ
 * [Neco プロジェクトのスキルチェックシート](https://gist.github.com/ymmt2005/bd92296166e52d1beba9df8ac516a9db)
     * いろいろまとまっていて良い
     * こういうの準備しておきたい気持ち 
+* [Getting Things Done をベースにした仕事の進め方 ](https://speakerdeck.com/south37/how-to-work-with-getting-things-done)
+* [44 engineering management lessons](https://www.defmacro.org/2014/10/03/engman.html)
+* [How We Structure Our Work At Mercari Microservices Platform Team](https://speakerdeck.com/tcnksm/how-we-structure-our-work-at-mercari-microservices-platform-team)
