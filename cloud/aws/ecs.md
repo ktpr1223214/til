@@ -150,6 +150,40 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * [Amazon ECS availability best practices](https://aws.amazon.com/jp/blogs/containers/amazon-ecs-availability-best-practices/)
     * これを参考に
 
+## ECS + ELB
+* target になるのは、あくまでインスタンス（port）
+* デプロイでタスクが増える場合は、ELB からはターゲットが増えていることになる
+  * ECS Task 増える -> ECS Service が TG に登録 -> draining して解除 -> Task 終了
+* https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-target-groups.html#deregistration-delay
+
+## サービスの更新
+* [サービスの更新](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/update-service.html)
+
+## デプロイ周辺
+* デプロイメントは、タスク定義またはサービスの必要数を更新することでトリガーされる
+  * デプロイ中、サービススケジューラは、最小ヘルス率と最大ヘルス率のパラメータを使用して、デプロイ戦略を判断
+  * [その他のサービスの概念](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/ecs_services.html#service_concepts)
+
+* EC2+ASG+ECS な構成の場合に、インスタンス入れ替え
+  * ASG からインスタンスを全部 detach -> このとき新しいインスタンスを起動するといった内容にチェック
+  * このとき旧インスタンスは ASG の管理から外れるだけで ECS の管理から外れるわけではない
+* 新しいインスタンスが起動したら、ECSで 1台ずつ Draining -> 新しいインスタンス上でタスクが起動
+* 旧インスタンスを ECS のクラスターから deregistration する。これはコンテナインスタンスのIDのリンクから画面遷移して画面右上にボタンがある -> これで、ECS の管理から外れる
+* 旧インスタンスを削除
+
+### タスクの配置
+* [Amazon ECS Task Placement](https://aws.amazon.com/jp/blogs/compute/amazon-ecs-task-placement/)
+  * By default, ECS uses the following placement strategies:
+    * When you run tasks with the RunTask API action, tasks are placed randomly in a cluster.
+    * When you launch and terminate tasks with the CreateService API action, the service scheduler spreads the tasks across the Availability Zones (and the instances within the zones) in a cluster.
+
+
+## ELB との構成
+* ELB: public subnet
+* ECS task: private subnet
+  * ELB -> ECS は private ip によると思うので、ECS task が動くところ（EC2 とか）で、public ip は持たなくても処理を受けることは可能
+  * ただし、コンテナからインターネットには出られないので、ECR なりを使うには VPC Endpoint が必須
+
 ## トラブルシューティング
 * EC2 cluster なら、EC2 を探し出して /var/lib/docker/containers/ 辺りからログが見られるので、確認する(ls -l で時系列をみて)
   * ログ確認して想定されるログが出てない場合はアプリ側の出力方法を確認(ファイルのみに出力されているなど)
