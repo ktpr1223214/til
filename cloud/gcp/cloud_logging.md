@@ -67,3 +67,32 @@ $ gcloud logging read "logName : projects/<project-name>/logs/cloudaudit.googlea
   * たとえば、組織のプロジェクトから 1 か所に集中して、監査ログエントリを集約、エクスポート可能
   * 集約シンク機能を使用するには、Google Cloud の組織またはフォルダにシンクを作成し、シンクの includeChildren パラメータを True に設定
     * これにより、そのシンクは組織またはフォルダに加えて、それに含まれているすべてのフォルダ、請求先アカウント、プロジェクトから（再帰的に）ログエントリをエクスポートできるようになり、シンクのクエリを使用して、プロジェクト、リソースタイプ、名前のついたログからログエントリを指定できる
+* エクスポートしたログの可用性
+  * Cloud Storage バケットへのログエントリの保存は 1 時間ごとに一括して行われます。最初のエントリが表示されるまでに 2～3 時間かかることがあります。
+* 時間例
+  * 18:13: service account 作成
+  * 19:06: gcs に連携
+    * 09:00:00_09:59:59_S0.json
+    * JST で 18:00~18:59
+
+* エクスポートの詳細
+  * [Using exported logs](https://cloud.google.com/logging/docs/export/using_exported_logs)
+* Cloud Storage の場合
+  * Cloud Storage バケットへのログエントリの保存は 1 時間ごとに一括
+  * ```my-gcs-bucket/\<LogEntry\>/YYYY/MM/DD/```
+    * LogEntry は https://cloud.google.com/logging/docs/export/using_exported_logs#the_logentry_type
+    * syslog/request_log/activity
+  * ファイル内のログエントリの並べ替え順は一定ではなく、保証されないことに注意!!!
+
+* ログの解釈  
+  * [サンプル監査ログエントリの解釈](https://cloud.google.com/logging/docs/audit/understanding-audit-logs#interpreting_the_sample_audit_log_entry)  
+  * [LogEntry](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry)
+    * An individual entry in a log.    
+  * [AuditLog](https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog)
+    * Common audit log format for Google Cloud Platform API operations.        
+  * [AuditData](https://cloud.google.com/iam/docs/reference/rest/v1/AuditData)
+    * Audit log information specific to Cloud IAM admin APIs. This message is serialized as an Any type in the ServiceData message of an AuditLog message.
+
+* 巨大 or 処理時間がかかる場合の audit log
+  * オペレーションが非同期で実行される、またはサイズの大きい AuditLog レコードが生成されると、1 つの監査対象オペレーションが複数のログエントリに分割
+  * 同じオペレーションに複数のログエントリが存在する場合、LogEntry オブジェクトに operation フィールドが含まれ、同じオペレーションのエントリの LogEntry.operation.id と LogEntry.operation.producer に同じ値が設定
