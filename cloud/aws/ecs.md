@@ -3,7 +3,6 @@ title: ECS
 ---
 
 ## ECS
-
 * ECS agent のインストール
 ``` bash
 # cf. https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/ecs-agent-install.html#ecs-agent-install-al2
@@ -13,6 +12,13 @@ $ sudo amazon-linux-extras install -y ecs; sudo systemctl enable --now ecs
 
 * インストールしたインスタンスから AMI 作成→インスタンス作成などすれば、ECS cluster に入っていることが確認できるはず
     * userdata で
+
+* stop-task
+  * When StopTask is called on a task, the equivalent of docker stop is issued to the containers running in the task
+  * This results in a SIGTERM value and a default 30-second timeout, after which the SIGKILL value is sent and the containers are forcibly stopped
+  * If the container handles the SIGTERM value gracefully and exits within 30 seconds from receiving it, no SIGKILL value is sent
+  * ECS container agent で ECS_CONTAINER_STOP_TIMEOUT を設定することで、上記 30 秒は変更可能
+    * [Amazon ECS コンテナエージェントの設定](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/ecs-agent-config.html)
 
 ### user data
 * [cloud-init-per ユーティリティ](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/bootstrap_container_instance.html#cloud-init-per)
@@ -171,12 +177,46 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * 旧インスタンスを ECS のクラスターから deregistration する。これはコンテナインスタンスのIDのリンクから画面遷移して画面右上にボタンがある -> これで、ECS の管理から外れる
 * 旧インスタンスを削除
 
+### Draining
+* クラスタからコンテナインスタンスを削除しなければならない場合 例:システム更新の実行、Dockerデーモンの更新、クラスタのスケールダウンサイズ がある
+  * コンテナインスタンスのドレインにより、コンテナインスタンスを クラスター内のタスクに影響を与えずにクラスターを稼働させることが可能
+* container instance を DRAINING にすると、新しい ECS Task が配置されなくなる
+    * Service tasks on the draining container instance that are in the PENDING state are stopped immediately
+    * If there are container instances in the cluster that are available, replacement service tasks are started on them
+    * RUNNING の container instance は ECS Service の deployment parameter（minimumHealthyPercent・maximumPercent）に応じて停止・再配置が発生
+      * If minimumHealthyPercent is below 100%, the scheduler can ignore desiredCount temporarily during task replacement
+        * If tasks for services that do not use a load balancer are in the RUNNING state, they are considered healthy. Tasks for services that use a load balancer are considered healthy if they are in the RUNNING state and the container instance they are hosted on is reported as healthy by the load balancer
+      * The maximumPercent parameter represents an upper limit on the number of running tasks during task replacement, which enables you to define the replacement batch size
+        *  ex. desiredCount := 4 の場合、a maximum of 200% starts four new tasks before stopping the four tasks to be drained (provided that the cluster resources required to do this are available）
+    * A container instance has completed draining when there are no more RUNNING tasks
+* minimum healthy percent/maximum percent は update-service/container instance の DRAINING 時に参照される
+  * [Updating a service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/update-service.html)
+
+### ECS update
+* ECS Service + ELB の場合の update 処理流れ
+  * When the service scheduler replaces a task during an update, the service first removes the task from the load balancer (if used) and waits for the connections to drain
+  * Then, the equivalent of docker stop is issued to the containers running in the task. This results in a SIGTERM signal and a 30-second timeout, after which SIGKILL is sent and the containers are forcibly stopped
+  * If the container handles the SIGTERM signal gracefully and exits within 30 seconds from receiving it, no SIGKILL signal is sent
+  * The service scheduler starts and stops tasks as defined by your minimum healthy percent and maximum percent settings.
+
+* [Does ECS update-service command marks the container instance state to draining when use with the --force-new-deployment option?](https://stackoverflow.com/questions/61409747/does-ecs-update-service-command-marks-the-container-instance-state-to-draining-w)
+  1. ECS sends DeregisterTargets call and the targets change the status to "draining". New connections will not be served to these targets.
+  2. If the deregistration delay time elapsed and there are still in-flight requests, the ALB will terminate them and clients will receive 5XX responses originated from the ALB.
+  3. The targets are deregistered from the target group.
+  4. ECS will send the stop call to the tasks and the ECS-agent will gracefully stop the containers (SIGTERM).
+  5. If the containers are not stopped within the stop timeout period (ECS_CONTAINER_STOP_TIMEOUT by default 30s) they will force stopped (SIGKILL).
+
+### ECS Stop task
+* こいつを呼び出すと、ELB からの deregistration とかそういった ECS Service がやる作業は恐らく飛ばされるはずで断（502）が発生するはず
+  * ECS Service のイベントをみると、service ~ has begun draining connections on 1 tasks と出たりはしてはいるが..
+  * https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html#http-502-issues
+* 例えば 2 つ ECS Task を動かしている場合に、1 つを落とすと上の事象。で、ECS Task を全部落とすと 最初は 502 でしばらくすると 503 に
+
 ### タスクの配置
 * [Amazon ECS Task Placement](https://aws.amazon.com/jp/blogs/compute/amazon-ecs-task-placement/)
   * By default, ECS uses the following placement strategies:
     * When you run tasks with the RunTask API action, tasks are placed randomly in a cluster.
     * When you launch and terminate tasks with the CreateService API action, the service scheduler spreads the tasks across the Availability Zones (and the instances within the zones) in a cluster.
-
 
 ## ELB との構成
 * ELB: public subnet
