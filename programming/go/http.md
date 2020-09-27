@@ -79,3 +79,16 @@ title: HTTP
 
 ### その他
 * [Why Handler registered by http.HandleFunc is called twice?](https://groups.google.com/forum/#!topic/golang-nuts/1sgaQGpIILM)
+
+## Reference
+* [So you want to expose Go on the Internet](https://blog.cloudflare.com/exposing-go-on-the-internet/)
+  * Applying timeouts is a matter of resource control. Even if goroutines are cheap, file descriptors are always limited
+  * A zero/default http.Server, like the one used by the package-level helpers http.ListenAndServe and http.ListenAndServeTLS, comes with no timeouts -> 避ける
+  * IdleTimeout: HTTP の Keep-Alive の idle time 設定
+  * TCP Keep-Alives
+    * こっちは TCP layer（かつ OS レベル）
+    * https://github.com/golang/go/blob/38543c2813a1075e09693894625421309d8ef333/src/net/tcpsockopt_unix.go#L15
+      * 設定はこんな感じ
+* [The complete guide to Go net/http timeouts](https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/)
+  * server/client 側両方について
+  * SetDeadline: TCP/UDP のレイヤ（transport layer）のレベルの機能（net.Conn）
