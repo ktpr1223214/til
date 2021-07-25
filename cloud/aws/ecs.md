@@ -3,6 +3,14 @@ title: ECS
 ---
 
 ## ECS
+### 基本
+* [How Amazon ECS manages CPU and memory resources](https://aws.amazon.com/jp/blogs/containers/how-amazon-ecs-manages-cpu-and-memory-resources/)
+  * リソースの設定についてわかりやすく纏まっている
+* There are two general rules of thumb with containers:
+  * unless otherwise restricted and capped, a container that gets started on a given host (operating system) gets access to all the CPU and memory capacity available on that host.
+  * unless otherwise protected and guaranteed, all containers running on a given host (operating system) share CPU, memory, and other resources in the same way that other processes running on that host share those resources.
+
+### メモ類
 * ECS agent のインストール
 ``` bash
 # cf. https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/ecs-agent-install.html#ecs-agent-install-al2
