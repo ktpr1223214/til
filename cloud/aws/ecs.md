@@ -55,6 +55,19 @@ $ sudo amazon-linux-extras install -y ecs; sudo systemctl enable --now ecs
     * ALB と NLB に IP ターゲットとして登録が可能
     * ECSインスタンス（EC2）の ENI 上限には注意
 
+``` bash
+# CONTAINER ID を確認
+$ sudo docker ps
+$ sudo docker inspect <CONTAINER_ID> -f '{{.State.Pid}}'
+# この結果で表示される inet がコンテナの PIP なはず
+$ sudo nsenter -t <Pid> -n ip addr show
+```
+
+### Reference
+* [詳解: Amazon ECSのタスクネットワーク](https://aws.amazon.com/jp/blogs/news/under-the-hood-task-networking-for-amazon-ecs/)
+* [Containers in Deep Space](https://ig.nore.me/presentations/2018/11/containers-in-deep-space/)
+  * awsvpc での ~internal~ecs~pause コンテナとか
+
 ## EFS との連携
 * [EFS マウントヘルパー](https://docs.aws.amazon.com/ja_jp/efs/latest/ug/using-amazon-efs-utils.html#efs-mount-helper)
     * 基本はこれを使うべきっぽい
@@ -185,6 +198,13 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * 旧インスタンスを ECS のクラスターから deregistration する。これはコンテナインスタンスのIDのリンクから画面遷移して画面右上にボタンがある -> これで、ECS の管理から外れる
 * 旧インスタンスを削除
 
+### 参考
+* [Amazon ECS でのコンテナデプロイの高速化
+](https://toris.io/2021/04/speeding-up-amazon-ecs-container-deployments/)
+  * 良い
+* [ALB と docker ヘルスチェックによる ECS の挙動について](https://blog.msysh.me/posts/2020/08/behavior_of_ecs_by_alb_and_docker_health_check.html)
+  * ELB ヘルスチェックとコンテナヘルスチェックについて
+
 ### Draining
 * クラスタからコンテナインスタンスを削除しなければならない場合 例:システム更新の実行、Dockerデーモンの更新、クラスタのスケールダウンサイズ がある
   * コンテナインスタンスのドレインにより、コンテナインスタンスを クラスター内のタスクに影響を与えずにクラスターを稼働させることが可能
@@ -231,6 +251,35 @@ $ curl http://<private_ip>:<port>/<health_check_path>
 * ECS task: private subnet
   * ELB -> ECS は private ip によると思うので、ECS task が動くところ（EC2 とか）で、public ip は持たなくても処理を受けることは可能
   * ただし、コンテナからインターネットには出られないので、ECR なりを使うには VPC Endpoint が必須
+
+## メトリクス
+### 標準（Insights 以外）
+* CPU/Memory Reservation
+  * Cluster レベルでのみ取得可能 = EC2 cluster のみ（not Fargate）
+  * クラスターのメモリ予約率 (このメトリクスは ClusterName でのみフィルタ処理できます) は、クラスター内の Amazon ECS タスクによって予約されているメモリの合計を、クラスター内のすべてのコンテナインスタンスに登録されているメモリの合計で割った数として測定
+    * (Total MiB of memory reserved by tasks in cluster x 100) / (Total MiB of memory registered by container instances in cluster)
+  * Task レベルか、Task Definition のコンテナ側で定義する値かが使われるはず。前者が定義されていれば当然前者ベースで
+* CPU/Memory Utilization
+  * クラスターとクラスター+サービスレベルが存在
+  * 前者はやはり EC2 cluster のみで
+    *  (Total CPU units used by tasks in cluster) x 100 / (Total CPU units registered by container instances in cluster) とか
+  * 後者は
+    * (Total CPU units used by tasks in service) x 100 /  (Total CPU units specified in task definition) x (number of tasks in service) になる
+    * つまり、100% を超える可能性があるメトリクスである。具体的には、メモリに hard limit を設定しなかった場合や、EC2 cluster での CPU Utilization の場合に（Faragte cluster の CPU では起きえないはず）
+  * EC2 cluster に 1 service の場合で、Task/Conttainer のいずれでも CPU のリソース設定をしていない場合は、Cluster と Service の CPU Utilization は一致する（この場合でも、メモリは Task 側で何かしら設定しているはずなので一致しない）
+* Memory の方が CPU よりも細かな制御が可能
+
+### Insights
+* ある Task Definition が 1 service でのみ利用されているなら、Task Definition/Service 両方の Dimension でメトリクスは一致
+* CloudWatch > Container Insights から ECS Service を選択
+  * service レベルでの Insights CpuUtilized / CpuReserved は、通常メトリクスの CPU Utilization と同じ（Utilized は CPU の場合ユニット数）
+  * 下にあるタスクのパフォーマンスは、タスク単位のメトリクス
+* CloudWatch > Container Insights から ECS Tasks を選択
+  * 下にあるタスクのパフォーマンスは、コンテナ単位のメトリクスだがコンテナ定義単位で CPU やメモリ指定をしていないと表示されない
+    * cf. https://dev.classmethod.jp/articles/how-to-check-container-cpu-usage-by-container-insights/
+  * （Fargate はさておき）EC2 cluster で Insights 有効にした場合のコンテナ単位のメトリクス/タスク単位のメトリクスは cAdvisor と一致するのかどうか
+* [AWS Fargate 用の Right Sizing ダッシュボードで解決される課題は何ですか？](https://observability.workshop.aws/ja/containerinsights/ecs/_rightsizing.html)
+  * 参考
 
 ## トラブルシューティング
 * EC2 cluster なら、EC2 を探し出して /var/lib/docker/containers/ 辺りからログが見られるので、確認する(ls -l で時系列をみて)
