@@ -2,6 +2,14 @@
 title: Linux
 ---
 
+## /bin と /usr/bin
+[参考: The Case for the /usr Merge](https://www.freedesktop.org/wiki/Software/systemd/TheCaseForTheUsrMerge/)
+  * [Why is /bin a symbolic link to /usr/bin?](https://unix.stackexchange.com/questions/266517/why-is-bin-a-symbolic-link-to-usr-bin) も一応
+
+多くの Linux distribution では `/bin -> usr/bin` なシンボリックリンクが貼られている。
+昔は分ける意味があったが、今や諸々あってないので不要な複雑さをなくす意味などがあるらしい。注意点として、古い環境で必ずしも
+該当するわけではない。
+
 ## user/group
 * ユーザーの情報は /etc/passwd
   * ユーザー名:パスワード:ユーザーID:グループID:その他の情報:ホームディレクトリ:シェル
